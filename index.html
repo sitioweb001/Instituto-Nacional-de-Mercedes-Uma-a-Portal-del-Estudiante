@@ -20,7 +20,6 @@
     padding: 0 0 40px;
   }
 
-  /* ── Header ── */
   .portal-header {
     width: 100%; background: rgba(0,0,0,0.25);
     padding: 14px 20px; display: flex; align-items: center; gap: 12px;
@@ -31,7 +30,6 @@
   .portal-header h1 { color: white; font-size: 15px; font-weight: 700; }
   .portal-header p  { color: rgba(255,255,255,0.7); font-size: 11px; }
 
-  /* ── Card principal ── */
   .card {
     background: white; border-radius: 18px;
     padding: 28px 24px; width: 100%; max-width: 420px;
@@ -41,7 +39,6 @@
   .card h2 { color: var(--blue-900); font-size: 20px; text-align: center; margin-bottom: 6px; }
   .card .subtitle { color: var(--gray-500); font-size: 13px; text-align: center; margin-bottom: 22px; }
 
-  /* ── Botones de tipo de usuario ── */
   .tipo-btns { display: flex; gap: 12px; margin-bottom: 0; }
   .tipo-btn {
     flex: 1; padding: 20px 10px; border: 2.5px solid #e2e8f0;
@@ -54,7 +51,6 @@
   .tipo-btn .lbl  { font-size: 13px; font-weight: 700; color: var(--gray-900); }
   .tipo-btn .sub  { font-size: 11px; color: var(--gray-500); margin-top: 3px; }
 
-  /* ── Inputs ── */
   label.campo { display: block; font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; margin-bottom: 4px; margin-top: 14px; }
   input.campo {
     width: 100%; padding: 12px 14px; border: 1.5px solid #d1d5db;
@@ -63,7 +59,6 @@
   }
   input.campo:focus { border-color: var(--blue-600); }
 
-  /* ── Botón principal ── */
   .btn-main {
     width: 100%; padding: 14px; margin-top: 18px;
     background: var(--blue-900); color: white; border: none;
@@ -79,7 +74,6 @@
     cursor: pointer; font-family: inherit;
   }
 
-  /* ── Estado del alumno ── */
   .alumno-info {
     background: #f0f9ff; border: 1.5px solid #bae6fd;
     border-radius: 12px; padding: 16px; margin-bottom: 16px;
@@ -91,7 +85,6 @@
     padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-top: 6px;
   }
 
-  /* ── Acciones ── */
   .acciones { display: flex; flex-direction: column; gap: 10px; }
   .btn-accion {
     padding: 16px; border: none; border-radius: 12px;
@@ -104,7 +97,6 @@
   .btn-permiso   { background: var(--amber-600); color: white; }
   .btn-logout    { background: var(--gray-100); color: var(--gray-700); margin-top: 4px; }
 
-  /* ── Estado / badge ── */
   .estado-badge {
     display: flex; align-items: center; justify-content: center;
     gap: 8px; padding: 12px; border-radius: 10px; font-size: 14px;
@@ -115,7 +107,6 @@
   .badge-ausente { background: #fee2e2; color: var(--red-600); }
   .badge-pending { background: #f0f9ff; color: var(--blue-700); }
 
-  /* ── Notificación flotante ── */
   #notif {
     position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
     padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 14px;
@@ -126,7 +117,6 @@
   .notif-error { background: var(--red-600); }
   .notif-info  { background: var(--blue-700); }
 
-  /* ── Spinner ── */
   .spinner {
     display: inline-block; width: 18px; height: 18px;
     border: 3px solid rgba(255,255,255,.3);
@@ -135,14 +125,12 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Horario info ── */
   .horario-chip {
     background: #eff6ff; border: 1px solid #bfdbfe;
     border-radius: 8px; padding: 8px 12px; font-size: 12px;
     color: var(--blue-700); margin-bottom: 16px; text-align: center;
   }
 
-  /* ── Vista oculta por defecto ── */
   .view { display: none; }
   .view.active { display: block; }
 </style>
@@ -151,7 +139,6 @@
 
 <div id="notif"></div>
 
-<!-- HEADER -->
 <div class="portal-header">
   <img src="logo2.svg" alt="INMU" onerror="this.src='logo3.jpg'">
   <div>
@@ -160,7 +147,6 @@
   </div>
 </div>
 
-<!-- CARD -->
 <div class="card" id="card-main">
 
   <!-- ══ VISTA 1: Seleccionar tipo de usuario ══ -->
@@ -172,8 +158,6 @@
         <span class="icon">🎒</span>
         <span class="lbl">Soy Alumno</span>
         <span class="sub">Marcar asistencia</span>
-      </button>
-
       </button>
     </div>
   </div>
@@ -241,7 +225,7 @@
 // ════════════════════════════════════════════════════════════
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKnxasl94QOwaLx2QZMDNnfNG8NTtnWg1agE9shf9cyeYeP1PsgtUjbu4X94lXRSIM/exec";
 
-// Horario por defecto (puede venir de localStorage del index principal compartido)
+// Horario por defecto
 function getHorario() {
     try {
         const h = JSON.parse(localStorage.getItem('horario_asistencia') || '{}');
@@ -260,7 +244,6 @@ function dentroDelHorario() {
     return minAhora >= minInicio && minAhora <= minFin;
 }
 
-// Estado actual del alumno en sesión
 let alumnoActual = null;
 
 // ════════════════════════════════════════════════════════════
@@ -285,11 +268,9 @@ function notif(msg, tipo='ok', ms=3200) {
 // ════════════════════════════════════════════════════════════
 function elegirTipo(tipo) {
     if (tipo === 'docente') {
-        // Redirigir al index principal
         window.location.href = 'index.html';
         return;
     }
-    // Verificar si el acceso de alumnos está activo
     const activo = localStorage.getItem('alumno_acceso') !== 'false';
     if (!activo) { irA('v-bloqueado'); return; }
 
@@ -311,7 +292,7 @@ function mostrarHorario() {
 }
 
 // ════════════════════════════════════════════════════════════
-// VALIDAR ALUMNO POR NIE O NOMBRE
+// VALIDAR ALUMNO — CORREGIDO para usar endpoint unificado
 // ════════════════════════════════════════════════════════════
 async function validarAlumno() {
     const query = (document.getElementById('input-nie').value || '').trim();
@@ -322,23 +303,33 @@ async function validarAlumno() {
     btn.innerHTML = '<span class="spinner"></span> Buscando...';
 
     try {
-        // Buscar en todos los alumnos
-        const res = await fetchConTimeout(
-            `${SCRIPT_URL}?tipo=buscar_alumno&query=${encodeURIComponent(query)}`, 8000
-        );
-        const data = await res.json();
-
-        if (!data || (!data.nie && !data.nombre)) {
+        // Usar el endpoint de ALUMNOS filtrado por query
+        // El sistema unificado tiene: /exec?tipo=alumnos y luego filtramos en JS
+        const res = await fetchConTimeout(`${SCRIPT_URL}?tipo=alumnos`, 8000);
+        const todos = await res.json();
+        
+        if (!Array.isArray(todos) || todos.length === 0) {
             notif('❌ No se encontró ningún alumno con esos datos.', 'error');
             btn.disabled = false; btn.textContent = '🔍 Validar Acceso';
             return;
         }
 
-        alumnoActual = data;
-        mostrarPanelAlumno(data);
+        // Buscar coincidencia exacta de NIE o parcial de nombre
+        const norm = s => (s||'').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        const qn = norm(query);
+        const found = todos.find(a => norm(a.nie) === qn || norm(a.nombre).includes(qn));
+
+        if (!found) {
+            notif('❌ No se encontró ningún alumno con esos datos.', 'error');
+            btn.disabled = false; btn.textContent = '🔍 Validar Acceso';
+            return;
+        }
+
+        alumnoActual = found;
+        mostrarPanelAlumno(found);
 
     } catch(e) {
-        // Fallback offline: buscar en cache local
+        // Fallback offline
         const localAlumnos = obtenerAlumnosLocal();
         const found = buscarEnLocal(localAlumnos, query);
         if (found) {
@@ -358,9 +349,7 @@ function obtenerAlumnosLocal() {
 function buscarEnLocal(lista, q) {
     const norm = s => (s||'').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
     const qn = norm(q);
-    return lista.find(a =>
-        norm(a.nie) === qn || norm(a.nombre).includes(qn)
-    ) || null;
+    return lista.find(a => norm(a.nie) === qn || norm(a.nombre).includes(qn)) || null;
 }
 
 function mostrarPanelAlumno(data) {
@@ -379,7 +368,7 @@ function mostrarPanelAlumno(data) {
 }
 
 // ════════════════════════════════════════════════════════════
-// VERIFICAR ESTADO DE HOY (¿ya marcó?)
+// VERIFICAR ESTADO DE HOY
 // ════════════════════════════════════════════════════════════
 async function verificarEstadoHoy(alumno) {
     const badge = document.getElementById('estado-hoy-badge');
@@ -393,9 +382,11 @@ async function verificarEstadoHoy(alumno) {
         const fecha = new Date().toLocaleDateString('es-ES');
         const params = new URLSearchParams({
             tipo: 'detalle_alumno',
-            nombre: alumno.nombre, nie: alumno.nie || '',
-            sexo: alumno.sexo || '', grado: alumno.grado || '',
-            seccion: alumno.seccion || '', fecha
+            nombre: alumno.nombre,
+            nie: alumno.nie || '',
+            grado: alumno.grado || '',
+            seccion: alumno.seccion || '',
+            fecha
         });
         const res = await fetchConTimeout(`${SCRIPT_URL}?${params.toString()}`, 6000);
         const det = await res.json();
@@ -414,13 +405,11 @@ async function verificarEstadoHoy(alumno) {
             acciones.style.opacity = '0.5';
             acciones.style.pointerEvents = 'none';
         } else {
-            // Verificar horario
             const dentro = dentroDelHorario();
             if (!dentro) {
                 badge.className = 'estado-badge badge-ausente';
                 badge.textContent = '⏰ Fuera del horario de marcado';
                 document.getElementById('btn-presente').disabled = true;
-                document.getElementById('btn-permiso').disabled = false;
             } else {
                 badge.className = 'estado-badge badge-pending';
                 badge.textContent = '📌 No has marcado asistencia hoy';
@@ -442,7 +431,6 @@ async function verificarEstadoHoy(alumno) {
 async function marcarAsistencia(tipo) {
     if (!alumnoActual) return;
 
-    // Verificar horario para "presente"
     if (tipo === 'presente' && !dentroDelHorario()) {
         const h = getHorario();
         notif(`⏰ El horario de marcado es ${h.inicio}–${h.fin}. Solicita un permiso.`, 'error', 4000);
@@ -468,7 +456,7 @@ async function marcarAsistencia(tipo) {
         grado:   alumnoActual.grado,
         seccion: alumnoActual.seccion,
         sexo:    alumnoActual.sexo,
-        estado:  tipo,      // 'presente' | 'permiso'
+        estado:  tipo,
         fecha:   fechaStr,
         hora:    horaStr
     };
@@ -478,7 +466,6 @@ async function marcarAsistencia(tipo) {
             method: 'POST', mode: 'no-cors',
             body: JSON.stringify(payload)
         });
-        // Guardar en local como respaldo
         const key = `asist_${alumnoActual.nie}_${fechaStr.replace(/\//g,'_')}`;
         try { localStorage.setItem(key, JSON.stringify(payload)); } catch(e){}
 
@@ -496,10 +483,9 @@ async function marcarAsistencia(tipo) {
         document.getElementById('acciones-box').style.pointerEvents = 'none';
 
     } catch(e) {
-        // Guardar offline igual
         const key = `asist_offline_${alumnoActual.nie}_${Date.now()}`;
         try { localStorage.setItem(key, JSON.stringify(payload)); } catch(e2){}
-        notif('⚠ Sin conexión. Asistencia guardada localmente (se sincronizará).', 'info', 5000);
+        notif('⚠ Sin conexión. Asistencia guardada localmente.', 'info', 5000);
     }
 
     btns.forEach(b => { b.disabled = false; });
@@ -511,7 +497,7 @@ async function marcarAsistencia(tipo) {
 }
 
 // ════════════════════════════════════════════════════════════
-// CERRAR SESIÓN ALUMNO
+// CERRAR SESIÓN
 // ════════════════════════════════════════════════════════════
 function cerrarSesionAlumno() {
     alumnoActual = null;
