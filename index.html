@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>INMU — Portal del Estudiante</title>
+<style>
+  :root {
+    --blue-900: #0C447C; --blue-700: #1a5fa8; --blue-600: #2563eb;
+    --green-600: #16a34a; --green-700: #15803d;
+    --amber-600: #d97706; --red-600: #dc2626;
+    --gray-900: #111827; --gray-700: #374151; --gray-500: #6b7280; --gray-100: #f3f4f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0C447C 0%, #1a5fa8 50%, #0C447C 100%);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 0 0 40px;
+  }
+
+  /* ── Header ── */
+  .portal-header {
+    width: 100%; background: rgba(0,0,0,0.25);
+    padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    margin-bottom: 24px;
+  }
+  .portal-header img { height: 40px; object-fit: contain; }
+  .portal-header h1 { color: white; font-size: 15px; font-weight: 700; }
+  .portal-header p  { color: rgba(255,255,255,0.7); font-size: 11px; }
+
+  /* ── Card principal ── */
+  .card {
+    background: white; border-radius: 18px;
+    padding: 28px 24px; width: 100%; max-width: 420px;
+    margin: 0 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+  }
+  .card h2 { color: var(--blue-900); font-size: 20px; text-align: center; margin-bottom: 6px; }
+  .card .subtitle { color: var(--gray-500); font-size: 13px; text-align: center; margin-bottom: 22px; }
+
+  /* ── Botones de tipo de usuario ── */
+  .tipo-btns { display: flex; gap: 12px; margin-bottom: 0; }
+  .tipo-btn {
+    flex: 1; padding: 20px 10px; border: 2.5px solid #e2e8f0;
+    border-radius: 14px; background: white; cursor: pointer;
+    text-align: center; transition: all .2s; font-family: inherit;
+  }
+  .tipo-btn:hover { border-color: var(--blue-600); background: #eff6ff; }
+  .tipo-btn.activo { border-color: var(--blue-900); background: #dbeafe; }
+  .tipo-btn .icon { font-size: 36px; display: block; margin-bottom: 8px; }
+  .tipo-btn .lbl  { font-size: 13px; font-weight: 700; color: var(--gray-900); }
+  .tipo-btn .sub  { font-size: 11px; color: var(--gray-500); margin-top: 3px; }
+
+  /* ── Inputs ── */
+  label.campo { display: block; font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; margin-bottom: 4px; margin-top: 14px; }
+  input.campo {
+    width: 100%; padding: 12px 14px; border: 1.5px solid #d1d5db;
+    border-radius: 10px; font-size: 15px; font-family: inherit;
+    outline: none; transition: border-color .2s;
+  }
+  input.campo:focus { border-color: var(--blue-600); }
+
+  /* ── Botón principal ── */
+  .btn-main {
+    width: 100%; padding: 14px; margin-top: 18px;
+    background: var(--blue-900); color: white; border: none;
+    border-radius: 12px; font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: opacity .2s;
+  }
+  .btn-main:disabled { opacity: .55; cursor: default; }
+  .btn-main:hover:not(:disabled) { opacity: .9; }
+  .btn-back {
+    width: 100%; padding: 11px; margin-top: 10px;
+    background: var(--gray-100); color: var(--gray-700); border: none;
+    border-radius: 12px; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+  }
+
+  /* ── Estado del alumno ── */
+  .alumno-info {
+    background: #f0f9ff; border: 1.5px solid #bae6fd;
+    border-radius: 12px; padding: 16px; margin-bottom: 16px;
+  }
+  .alumno-info h3 { color: var(--blue-900); font-size: 15px; margin-bottom: 8px; }
+  .alumno-info p  { font-size: 13px; color: var(--gray-700); margin: 3px 0; }
+  .alumno-info .nie-badge {
+    display: inline-block; background: var(--blue-900); color: white;
+    padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-top: 6px;
+  }
+
+  /* ── Acciones ── */
+  .acciones { display: flex; flex-direction: column; gap: 10px; }
+  .btn-accion {
+    padding: 16px; border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; gap: 10px; justify-content: center;
+    transition: opacity .18s;
+  }
+  .btn-accion:hover { opacity: .88; }
+  .btn-presente  { background: var(--green-600); color: white; }
+  .btn-permiso   { background: var(--amber-600); color: white; }
+  .btn-logout    { background: var(--gray-100); color: var(--gray-700); margin-top: 4px; }
+
+  /* ── Estado / badge ── */
+  .estado-badge {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 12px; border-radius: 10px; font-size: 14px;
+    font-weight: 700; margin-bottom: 14px;
+  }
+  .badge-ok      { background: #dcfce7; color: var(--green-700); }
+  .badge-permiso { background: #fef3c7; color: var(--amber-600); }
+  .badge-ausente { background: #fee2e2; color: var(--red-600); }
+  .badge-pending { background: #f0f9ff; color: var(--blue-700); }
+
+  /* ── Notificación flotante ── */
+  #notif {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 14px;
+    color: white; z-index: 9999; display: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25); max-width: 340px; text-align: center;
+  }
+  .notif-ok    { background: var(--green-600); }
+  .notif-error { background: var(--red-600); }
+  .notif-info  { background: var(--blue-700); }
+
+  /* ── Spinner ── */
+  .spinner {
+    display: inline-block; width: 18px; height: 18px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-top-color: white; border-radius: 50%;
+    animation: spin .6s linear infinite; margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Horario info ── */
+  .horario-chip {
+    background: #eff6ff; border: 1px solid #bfdbfe;
+    border-radius: 8px; padding: 8px 12px; font-size: 12px;
+    color: var(--blue-700); margin-bottom: 16px; text-align: center;
+  }
+
+  /* ── Vista oculta por defecto ── */
+  .view { display: none; }
+  .view.active { display: block; }
+</style>
+</head>
+<body>
+
+<div id="notif"></div>
+
+<!-- HEADER -->
+<div class="portal-header">
+  <img src="logo2.svg" alt="INMU" onerror="this.src='logo3.jpg'">
+  <div>
+    <h1>Instituto Nacional de Mercedes Umaña</h1>
+    <p>Portal del Estudiante</p>
+  </div>
+</div>
+
+<!-- CARD -->
+<div class="card" id="card-main">
+
+  <!-- ══ VISTA 1: Seleccionar tipo de usuario ══ -->
+  <div class="view active" id="v-selector">
+    <h2>Bienvenido/a 👋</h2>
+    <p class="subtitle">Selecciona cómo quieres ingresar</p>
+    <div class="tipo-btns">
+      <button class="tipo-btn" onclick="elegirTipo('alumno')">
+        <span class="icon">🎒</span>
+        <span class="lbl">Soy Alumno</span>
+        <span class="sub">Marcar asistencia</span>
+      </button>
+
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ VISTA 2: Login alumno por NIE/Nombre ══ -->
+  <div class="view" id="v-login-alumno">
+    <h2>🎒 Acceso de Alumno</h2>
+    <p class="subtitle">Ingresa tu NIE o tu nombre completo</p>
+
+    <div id="horario-info" class="horario-chip">⏰ Cargando horario de marcado...</div>
+
+    <label class="campo" for="input-nie">NIE o Nombre</label>
+    <input class="campo" type="text" id="input-nie"
+      placeholder="Ej: 19910934 o Berríos Rivera, Isis"
+      autocomplete="off" autocorrect="off" spellcheck="false"
+      onkeydown="if(event.key==='Enter') validarAlumno()">
+
+    <button class="btn-main" id="btn-validar" onclick="validarAlumno()">
+      🔍 Validar Acceso
+    </button>
+    <button class="btn-back" onclick="irA('v-selector')">← Volver</button>
+  </div>
+
+  <!-- ══ VISTA 3: Panel del alumno autenticado ══ -->
+  <div class="view" id="v-alumno-panel">
+    <h2>✅ Acceso correcto</h2>
+
+    <div class="alumno-info" id="alumno-info-box">
+      <h3 id="al-nombre">—</h3>
+      <p><strong>Grado:</strong> <span id="al-grado">—</span> · <strong>Sección:</strong> <span id="al-seccion">—</span></p>
+      <p><strong>Sexo:</strong> <span id="al-sexo">—</span> · <strong>Tel:</strong> <span id="al-tel">—</span></p>
+      <p><strong>Faltas acumuladas:</strong> <span id="al-faltas" style="font-weight:700;">—</span></p>
+      <span class="nie-badge" id="al-nie">NIE: —</span>
+    </div>
+
+    <div id="estado-hoy-badge" class="estado-badge badge-pending">⏳ Verificando estado de hoy...</div>
+
+    <div class="acciones" id="acciones-box">
+      <button class="btn-accion btn-presente" id="btn-presente" onclick="marcarAsistencia('presente')">
+        ✅ Marcar Asistencia (Presente)
+      </button>
+      <button class="btn-accion btn-permiso" id="btn-permiso" onclick="marcarAsistencia('permiso')">
+        🔑 Solicitar Permiso
+      </button>
+    </div>
+
+    <button class="btn-back" style="margin-top:14px;" onclick="cerrarSesionAlumno()">🚪 Cerrar sesión</button>
+  </div>
+
+  <!-- ══ VISTA 4: Sistema bloqueado ══ -->
+  <div class="view" id="v-bloqueado">
+    <h2>🚫 Acceso no disponible</h2>
+    <p class="subtitle" style="margin-bottom:20px;">
+      El acceso de alumnos está desactivado temporalmente.<br>
+      Contacta a tu docente.
+    </p>
+    <button class="btn-back" onclick="irA('v-selector')">← Volver</button>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// CONFIGURACIÓN
+// ════════════════════════════════════════════════════════════
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKnxasl94QOwaLx2QZMDNnfNG8NTtnWg1agE9shf9cyeYeP1PsgtUjbu4X94lXRSIM/exec";
+
+// Horario por defecto (puede venir de localStorage del index principal compartido)
+function getHorario() {
+    try {
+        const h = JSON.parse(localStorage.getItem('horario_asistencia') || '{}');
+        return { inicio: h.inicio || '06:30', fin: h.fin || '08:00' };
+    } catch(e) { return { inicio: '06:30', fin: '08:00' }; }
+}
+
+function dentroDelHorario() {
+    const h = getHorario();
+    const ahora = new Date();
+    const [hi, hm] = h.inicio.split(':').map(Number);
+    const [fi, fm] = h.fin.split(':').map(Number);
+    const minAhora = ahora.getHours() * 60 + ahora.getMinutes();
+    const minInicio = hi * 60 + hm;
+    const minFin    = fi * 60 + fm;
+    return minAhora >= minInicio && minAhora <= minFin;
+}
+
+// Estado actual del alumno en sesión
+let alumnoActual = null;
+
+// ════════════════════════════════════════════════════════════
+// NAVEGACIÓN
+// ════════════════════════════════════════════════════════════
+function irA(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const el = document.getElementById(viewId);
+    if (el) el.classList.add('active');
+}
+
+function notif(msg, tipo='ok', ms=3200) {
+    const el = document.getElementById('notif');
+    el.textContent = msg;
+    el.className = 'notif-' + tipo;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, ms);
+}
+
+// ════════════════════════════════════════════════════════════
+// ELEGIR TIPO DE USUARIO
+// ════════════════════════════════════════════════════════════
+function elegirTipo(tipo) {
+    if (tipo === 'docente') {
+        // Redirigir al index principal
+        window.location.href = 'index.html';
+        return;
+    }
+    // Verificar si el acceso de alumnos está activo
+    const activo = localStorage.getItem('alumno_acceso') !== 'false';
+    if (!activo) { irA('v-bloqueado'); return; }
+
+    mostrarHorario();
+    irA('v-login-alumno');
+    setTimeout(() => document.getElementById('input-nie').focus(), 300);
+}
+
+function mostrarHorario() {
+    const h = getHorario();
+    const chip = document.getElementById('horario-info');
+    const dentro = dentroDelHorario();
+    chip.style.background = dentro ? '#dcfce7' : '#fee2e2';
+    chip.style.color       = dentro ? '#15803d' : '#dc2626';
+    chip.style.borderColor = dentro ? '#86efac' : '#fca5a5';
+    chip.textContent = dentro
+        ? `⏰ Horario activo: ${h.inicio} – ${h.fin} ✅`
+        : `⏰ Horario de marcado: ${h.inicio} – ${h.fin} · Ahora fuera del horario`;
+}
+
+// ════════════════════════════════════════════════════════════
+// VALIDAR ALUMNO POR NIE O NOMBRE
+// ════════════════════════════════════════════════════════════
+async function validarAlumno() {
+    const query = (document.getElementById('input-nie').value || '').trim();
+    if (!query) { notif('Ingresa tu NIE o nombre.', 'error'); return; }
+
+    const btn = document.getElementById('btn-validar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Buscando...';
+
+    try {
+        // Buscar en todos los alumnos
+        const res = await fetchConTimeout(
+            `${SCRIPT_URL}?tipo=buscar_alumno&query=${encodeURIComponent(query)}`, 8000
+        );
+        const data = await res.json();
+
+        if (!data || (!data.nie && !data.nombre)) {
+            notif('❌ No se encontró ningún alumno con esos datos.', 'error');
+            btn.disabled = false; btn.textContent = '🔍 Validar Acceso';
+            return;
+        }
+
+        alumnoActual = data;
+        mostrarPanelAlumno(data);
+
+    } catch(e) {
+        // Fallback offline: buscar en cache local
+        const localAlumnos = obtenerAlumnosLocal();
+        const found = buscarEnLocal(localAlumnos, query);
+        if (found) {
+            alumnoActual = found;
+            mostrarPanelAlumno(found);
+        } else {
+            notif('⚠ Sin conexión. No se encontró el alumno localmente.', 'error');
+        }
+        btn.disabled = false; btn.textContent = '🔍 Validar Acceso';
+    }
+}
+
+function obtenerAlumnosLocal() {
+    try { return JSON.parse(localStorage.getItem('cache_alumnos') || '[]'); } catch(e) { return []; }
+}
+
+function buscarEnLocal(lista, q) {
+    const norm = s => (s||'').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const qn = norm(q);
+    return lista.find(a =>
+        norm(a.nie) === qn || norm(a.nombre).includes(qn)
+    ) || null;
+}
+
+function mostrarPanelAlumno(data) {
+    document.getElementById('al-nombre').textContent  = data.nombre || '—';
+    document.getElementById('al-grado').textContent   = data.grado  || '—';
+    document.getElementById('al-seccion').textContent = data.seccion || '—';
+    document.getElementById('al-sexo').textContent    = data.sexo   || '—';
+    document.getElementById('al-tel').textContent     = data.telefono || '—';
+    document.getElementById('al-nie').textContent     = 'NIE: ' + (data.nie || '—');
+
+    const btn = document.getElementById('btn-validar');
+    btn.disabled = false; btn.textContent = '🔍 Validar Acceso';
+
+    irA('v-alumno-panel');
+    verificarEstadoHoy(data);
+}
+
+// ════════════════════════════════════════════════════════════
+// VERIFICAR ESTADO DE HOY (¿ya marcó?)
+// ════════════════════════════════════════════════════════════
+async function verificarEstadoHoy(alumno) {
+    const badge = document.getElementById('estado-hoy-badge');
+    const acciones = document.getElementById('acciones-box');
+    const falEl = document.getElementById('al-faltas');
+
+    badge.className = 'estado-badge badge-pending';
+    badge.textContent = '⏳ Verificando estado de hoy...';
+
+    try {
+        const fecha = new Date().toLocaleDateString('es-ES');
+        const params = new URLSearchParams({
+            tipo: 'detalle_alumno',
+            nombre: alumno.nombre, nie: alumno.nie || '',
+            sexo: alumno.sexo || '', grado: alumno.grado || '',
+            seccion: alumno.seccion || '', fecha
+        });
+        const res = await fetchConTimeout(`${SCRIPT_URL}?${params.toString()}`, 6000);
+        const det = await res.json();
+
+        falEl.textContent = det.faltas_totales || 0;
+
+        const estadoHoy = det.estado_hoy || '';
+        if (estadoHoy === 'presente') {
+            badge.className = 'estado-badge badge-ok';
+            badge.textContent = '✅ Ya marcaste Presente hoy';
+            acciones.style.opacity = '0.5';
+            acciones.style.pointerEvents = 'none';
+        } else if (estadoHoy === 'permiso') {
+            badge.className = 'estado-badge badge-permiso';
+            badge.textContent = '🔑 Permiso registrado hoy';
+            acciones.style.opacity = '0.5';
+            acciones.style.pointerEvents = 'none';
+        } else {
+            // Verificar horario
+            const dentro = dentroDelHorario();
+            if (!dentro) {
+                badge.className = 'estado-badge badge-ausente';
+                badge.textContent = '⏰ Fuera del horario de marcado';
+                document.getElementById('btn-presente').disabled = true;
+                document.getElementById('btn-permiso').disabled = false;
+            } else {
+                badge.className = 'estado-badge badge-pending';
+                badge.textContent = '📌 No has marcado asistencia hoy';
+                acciones.style.opacity = '1';
+                acciones.style.pointerEvents = 'auto';
+            }
+        }
+    } catch(e) {
+        badge.className = 'estado-badge badge-pending';
+        badge.textContent = '⚠ Sin conexión — marca de todas formas';
+        acciones.style.opacity = '1';
+        acciones.style.pointerEvents = 'auto';
+    }
+}
+
+// ════════════════════════════════════════════════════════════
+// MARCAR ASISTENCIA / PERMISO
+// ════════════════════════════════════════════════════════════
+async function marcarAsistencia(tipo) {
+    if (!alumnoActual) return;
+
+    // Verificar horario para "presente"
+    if (tipo === 'presente' && !dentroDelHorario()) {
+        const h = getHorario();
+        notif(`⏰ El horario de marcado es ${h.inicio}–${h.fin}. Solicita un permiso.`, 'error', 4000);
+        return;
+    }
+
+    const btns = document.querySelectorAll('.btn-accion');
+    btns.forEach(b => { b.disabled = true; });
+
+    const btnActivo = tipo === 'presente'
+        ? document.getElementById('btn-presente')
+        : document.getElementById('btn-permiso');
+    btnActivo.innerHTML = '<span class="spinner"></span> Enviando...';
+
+    const ahora = new Date();
+    const fechaStr = ahora.toLocaleDateString('es-ES');
+    const horaStr  = ahora.toLocaleTimeString('es-ES');
+
+    const payload = {
+        tipo_post: 'asistencia_alumno',
+        nie:     alumnoActual.nie,
+        nombre:  alumnoActual.nombre,
+        grado:   alumnoActual.grado,
+        seccion: alumnoActual.seccion,
+        sexo:    alumnoActual.sexo,
+        estado:  tipo,      // 'presente' | 'permiso'
+        fecha:   fechaStr,
+        hora:    horaStr
+    };
+
+    try {
+        await fetch(SCRIPT_URL, {
+            method: 'POST', mode: 'no-cors',
+            body: JSON.stringify(payload)
+        });
+        // Guardar en local como respaldo
+        const key = `asist_${alumnoActual.nie}_${fechaStr.replace(/\//g,'_')}`;
+        try { localStorage.setItem(key, JSON.stringify(payload)); } catch(e){}
+
+        const badge = document.getElementById('estado-hoy-badge');
+        if (tipo === 'presente') {
+            badge.className = 'estado-badge badge-ok';
+            badge.textContent = '✅ ¡Asistencia marcada con éxito!';
+            notif('✅ ¡Presente! Tu asistencia fue registrada.', 'ok');
+        } else {
+            badge.className = 'estado-badge badge-permiso';
+            badge.textContent = '🔑 Permiso solicitado correctamente';
+            notif('🔑 Permiso registrado.', 'ok');
+        }
+        document.getElementById('acciones-box').style.opacity = '0.5';
+        document.getElementById('acciones-box').style.pointerEvents = 'none';
+
+    } catch(e) {
+        // Guardar offline igual
+        const key = `asist_offline_${alumnoActual.nie}_${Date.now()}`;
+        try { localStorage.setItem(key, JSON.stringify(payload)); } catch(e2){}
+        notif('⚠ Sin conexión. Asistencia guardada localmente (se sincronizará).', 'info', 5000);
+    }
+
+    btns.forEach(b => { b.disabled = false; });
+    if (tipo === 'presente') {
+        document.getElementById('btn-presente').textContent = '✅ Marcar Asistencia (Presente)';
+    } else {
+        document.getElementById('btn-permiso').textContent = '🔑 Solicitar Permiso';
+    }
+}
+
+// ════════════════════════════════════════════════════════════
+// CERRAR SESIÓN ALUMNO
+// ════════════════════════════════════════════════════════════
+function cerrarSesionAlumno() {
+    alumnoActual = null;
+    document.getElementById('input-nie').value = '';
+    document.getElementById('acciones-box').style.opacity = '1';
+    document.getElementById('acciones-box').style.pointerEvents = 'auto';
+    document.getElementById('btn-presente').disabled = false;
+    document.getElementById('btn-permiso').disabled = false;
+    irA('v-selector');
+}
+
+// ════════════════════════════════════════════════════════════
+// UTILIDADES
+// ════════════════════════════════════════════════════════════
+function fetchConTimeout(url, ms) {
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), ms);
+    return fetch(url, { signal: ctrl.signal });
+}
+</script>
+</body>
+</html>
