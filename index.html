@@ -555,28 +555,48 @@ function setTheme(t) {
 }
 
 // ════════════════════════════════════════════════════════════
-// JSONP helper — resuelve CORS desde GitHub Pages
+// FETCH helper — intenta fetch() primero, luego JSONP como fallback
+// GAS publica CORS headers automáticamente si está publicado como "Anyone"
 // ════════════════════════════════════════════════════════════
 function fetchJsonp(url, timeoutMs) {
-  timeoutMs = timeoutMs || 8000;
-  return new Promise(function(resolve, reject) {
-    var cb = '__cb_' + Math.random().toString(36).slice(2);
-    var script = document.createElement('script');
-    var tid = setTimeout(function() {
-      cleanup(); reject(new Error('JSONP timeout'));
-    }, timeoutMs);
+  timeoutMs = timeoutMs || 12000;
+  // Limpiar parámetro callback residual
+  const cleanUrl = url.replace(/[&?]callback=[^&]*/g, '');
+
+  // Intento 1: fetch() normal (funciona si GAS está bien publicado)
+  const fetchPromise = new Promise((resolve, reject) => {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), timeoutMs - 2000);
+    fetch(cleanUrl, { signal: ctrl.signal, redirect: 'follow' })
+      .then(r => {
+        clearTimeout(tid);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(resolve)
+      .catch(err => { clearTimeout(tid); reject(err); });
+  });
+
+  // Intento 2: JSONP clásico como fallback
+  const jsonpPromise = new Promise((resolve, reject) => {
+    const cb = '__cb_' + Math.random().toString(36).slice(2);
+    const script = document.createElement('script');
+    const tid = setTimeout(() => { cleanup(); reject(new Error('JSONP timeout')); }, timeoutMs);
     function cleanup() {
       clearTimeout(tid);
       delete window[cb];
       if (script.parentNode) script.parentNode.removeChild(script);
     }
-    window[cb] = function(data) { cleanup(); resolve(data); };
-    script.onerror = function() { cleanup(); reject(new Error('JSONP error')); };
-    // Agregar callback al URL
-    var sep = url.indexOf('?') >= 0 ? '&' : '?';
-    script.src = url + sep + 'callback=' + cb;
+    window[cb] = (data) => { cleanup(); resolve(data); };
+    script.onerror = () => { cleanup(); reject(new Error('JSONP error')); };
+    const sep = cleanUrl.indexOf('?') >= 0 ? '&' : '?';
+    script.src = cleanUrl + sep + 'callback=' + cb;
     document.head.appendChild(script);
   });
+
+  // Race: el primero que resuelva gana
+  return Promise.any([fetchPromise, jsonpPromise])
+    .catch(() => { throw new Error('Ambos métodos fallaron'); });
 }
 
 // ════════════════════════════════════════════════════════════
@@ -588,7 +608,7 @@ async function cargarHorario() {
   chip.textContent = '⏰ Verificando sistema...';
 
   try {
-    const h = await fetchJsonp(SCRIPT_URL + '?tipo=horario_asistencia', 8000);
+    const h = await fetchJsonp(SCRIPT_URL + '?tipo=horario_asistencia', 10000);
     try { localStorage.setItem('horario_asistencia', JSON.stringify(h)); } catch(_) {}
     if (h.mantenimiento === true) {
       mostrarBannerSistema('mantenimiento', '🔧 Sistema en mantenimiento. Intente más tarde.');
@@ -600,7 +620,9 @@ async function cargarHorario() {
     }
     actualizarChip(h);
     return;
-  } catch(e) { /* JSONP falló, usar caché */ }
+  } catch(e) {
+    console.error('[INMU] Error cargando horario:', e);
+  }
 
   // Fallback: caché local
   try {
@@ -908,8 +930,9 @@ function notif(msg, tipo='ok', ms=3200) {
 
 function fetchConTimeout(url, ms=8000) {
   const ctrl = new AbortController();
-  setTimeout(() => ctrl.abort(), ms);
-  return fetch(url, { signal: ctrl.signal });
+  const tid = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { signal: ctrl.signal })
+    .finally(() => clearTimeout(tid));
 }
 </script>
 </body>
