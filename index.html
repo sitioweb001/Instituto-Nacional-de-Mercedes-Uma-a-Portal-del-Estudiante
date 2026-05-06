@@ -365,16 +365,14 @@
 
   /* ── HORARIO CHIP ── */
   .horario-chip {
-    border-radius: 10px; padding: 11px 16px;
-    font-size: 13px; font-weight: 600;
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 12px; font-weight: 600;
     margin-bottom: 20px; text-align: center;
     transition: var(--trans);
-    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .horario-chip.active {
     background: var(--success-bg); color: var(--success-text);
     border: 1px solid var(--success-border);
-    font-size: 14px;
   }
   .horario-chip.inactive {
     background: rgba(239,68,68,.1); color: var(--red);
@@ -383,30 +381,6 @@
   .horario-chip.loading {
     background: var(--btn-secondary-bg); color: var(--text-muted);
     border: 1px solid var(--card-border);
-    animation: pulse-loading 1.5s ease-in-out infinite;
-  }
-  @keyframes pulse-loading {
-    0%,100% { opacity: 1; } 50% { opacity: .5; }
-  }
-
-  /* ── BANNER SISTEMA ── */
-  .sistema-banner {
-    display: none;
-    border-radius: 14px; padding: 18px 20px;
-    margin: 0 0 20px; gap: 14px;
-    align-items: center; text-align: left;
-    font-size: 14px; line-height: 1.5;
-    animation: fadeSlide .3s ease;
-  }
-  .sistema-banner strong { display: block; font-size: 15px; margin-bottom: 2px; }
-  .sistema-icon { font-size: 30px; flex-shrink: 0; }
-  .sistema-mantenimiento {
-    background: var(--warning-bg); color: var(--warning-text);
-    border: 1.5px solid var(--warning-border);
-  }
-  .sistema-apagado {
-    background: rgba(239,68,68,.1); color: var(--red);
-    border: 1.5px solid rgba(239,68,68,.25);
   }
 
   /* ── VIEWS ── */
@@ -448,8 +422,8 @@
       </div>
     </div>
 
-    <!-- Banner estado del sistema -->
-    <div id="sistema-banner" class="sistema-banner" style="display:none;"></div>
+    <!-- Banner estado sistema -->
+    <div id="sistema-banner" style="display:none;border-radius:14px;padding:16px 18px;margin-bottom:14px;gap:12px;align-items:center;font-size:13px;line-height:1.5;"></div>
 
     <div id="card-verificar">
     <div class="card">
@@ -581,98 +555,90 @@ function setTheme(t) {
 }
 
 // ════════════════════════════════════════════════════════════
-// HORARIO + ESTADO DEL SISTEMA (resuelve CORS con JSONP/no-cors)
+// JSONP helper — resuelve CORS desde GitHub Pages
 // ════════════════════════════════════════════════════════════
-async function cargarHorario() {
-  const chip = document.getElementById('horario-chip');
-  chip.className = 'horario-chip loading';
-  chip.textContent = '⏰ Verificando sistema...';
-
-  // Intentar JSONP para evitar CORS desde GitHub Pages
-  try {
-    const h = await fetchJsonp(`${SCRIPT_URL}?tipo=horario_asistencia`);
-    // Guardar con clave compartida (misma que usa el index docente)
-    try { localStorage.setItem('horario_asistencia', JSON.stringify(h)); } catch(_) {}
-    // Estado del sistema
-    if (h.mantenimiento === true) {
-      mostrarPantallaMantenimiento('🔧 Sistema en mantenimiento. Por favor intente más tarde.');
-      return;
-    }
-    if (h.activo === false) {
-      mostrarPantallaApagada('🔒 El portal de alumnos está desactivado temporalmente.');
-      return;
-    }
-    actualizarChip(h);
-    return;
-  } catch(e) { /* continúa con fallback */ }
-
-  // Fallback: usar horario guardado en localStorage
-  try {
-    const cached = JSON.parse(localStorage.getItem('horario_asistencia') || '{}');
-    if (cached.inicio) {
-      actualizarChip(cached);
-      mostrarNotifBanner('📴 Sin conexión — usando horario guardado.', 'warning');
-      return;
-    }
-  } catch(_) {}
-
-  // Sin nada: usar horario por defecto y avisar
-  chip.className = 'horario-chip inactive';
-  chip.textContent = '⚠ No se pudo verificar el horario';
-}
-
-// JSONP helper — evita el bloqueo CORS de Apps Script
-function fetchJsonp(url, timeout=8000) {
-  return new Promise((resolve, reject) => {
-    const cb  = '__cb_' + Math.random().toString(36).slice(2);
-    const src = url + '&callback=' + cb;
-    const script = document.createElement('script');
-    const tid = setTimeout(() => {
-      cleanup(); reject(new Error('Timeout'));
-    }, timeout);
+function fetchJsonp(url, timeoutMs) {
+  timeoutMs = timeoutMs || 8000;
+  return new Promise(function(resolve, reject) {
+    var cb = '__cb_' + Math.random().toString(36).slice(2);
+    var script = document.createElement('script');
+    var tid = setTimeout(function() {
+      cleanup(); reject(new Error('JSONP timeout'));
+    }, timeoutMs);
     function cleanup() {
       clearTimeout(tid);
       delete window[cb];
       if (script.parentNode) script.parentNode.removeChild(script);
     }
     window[cb] = function(data) { cleanup(); resolve(data); };
-    script.onerror = () => { cleanup(); reject(new Error('JSONP error')); };
-    script.src = src;
+    script.onerror = function() { cleanup(); reject(new Error('JSONP error')); };
+    // Agregar callback al URL
+    var sep = url.indexOf('?') >= 0 ? '&' : '?';
+    script.src = url + sep + 'callback=' + cb;
     document.head.appendChild(script);
   });
 }
 
-function mostrarPantallaMantenimiento(msg) {
-  const el = document.getElementById('sistema-banner');
-  if (!el) return;
-  el.className = 'sistema-banner sistema-mantenimiento';
-  el.innerHTML = `<span class="sistema-icon">🔧</span><div><strong>Sistema en Mantenimiento</strong><br><span>${msg}</span></div>`;
-  el.style.display = 'flex';
-  document.getElementById('card-verificar').style.display = 'none';
+// ════════════════════════════════════════════════════════════
+// HORARIO + ESTADO DEL SISTEMA
+// ════════════════════════════════════════════════════════════
+async function cargarHorario() {
+  const chip = document.getElementById('horario-chip');
+  chip.className = 'horario-chip loading';
+  chip.textContent = '⏰ Verificando sistema...';
+
+  try {
+    const h = await fetchJsonp(SCRIPT_URL + '?tipo=horario_asistencia', 8000);
+    try { localStorage.setItem('horario_asistencia', JSON.stringify(h)); } catch(_) {}
+    if (h.mantenimiento === true) {
+      mostrarBannerSistema('mantenimiento', '🔧 Sistema en mantenimiento. Intente más tarde.');
+      return;
+    }
+    if (h.activo === false) {
+      mostrarBannerSistema('apagado', '🔒 El portal de alumnos está desactivado temporalmente.');
+      return;
+    }
+    actualizarChip(h);
+    return;
+  } catch(e) { /* JSONP falló, usar caché */ }
+
+  // Fallback: caché local
+  try {
+    const cached = JSON.parse(localStorage.getItem('horario_asistencia') || '{}');
+    if (cached.inicio) {
+      actualizarChip(cached);
+      notif('📴 Sin conexión — usando horario guardado.', 'info', 4000);
+      return;
+    }
+  } catch(_) {}
+
+  chip.className = 'horario-chip inactive';
+  chip.textContent = '⚠ No se pudo verificar el horario';
 }
 
-function mostrarPantallaApagada(msg) {
-  const el = document.getElementById('sistema-banner');
-  if (!el) return;
-  el.className = 'sistema-banner sistema-apagado';
-  el.innerHTML = `<span class="sistema-icon">🔒</span><div><strong>Sistema Desactivado</strong><br><span>${msg}</span></div>`;
-  el.style.display = 'flex';
-  document.getElementById('card-verificar').style.display = 'none';
-}
-
-function mostrarNotifBanner(msg, tipo='info') {
-  notif(msg, tipo, 5000);
+function mostrarBannerSistema(tipo, msg) {
+  const banner = document.getElementById('sistema-banner');
+  const cardV  = document.getElementById('card-verificar');
+  if (banner) {
+    banner.style.display = 'flex';
+    banner.style.cssText += tipo === 'mantenimiento'
+      ? ';background:rgba(245,158,11,.15);border:1.5px solid rgba(245,158,11,.4);color:#b45309;'
+      : ';background:rgba(239,68,68,.1);border:1.5px solid rgba(239,68,68,.3);color:#dc2626;';
+    banner.innerHTML = '<span style="font-size:28px;flex-shrink:0">'
+      + (tipo==='mantenimiento'?'🔧':'🔒')
+      + '</span><div><strong style="display:block;font-size:15px;margin-bottom:3px">'
+      + (tipo==='mantenimiento'?'Sistema en Mantenimiento':'Portal Desactivado')
+      + '</strong>' + msg + '</div>';
+  }
+  if (cardV) cardV.style.display = 'none';
 }
 function actualizarChip(h) {
   const chip   = document.getElementById('horario-chip');
   const dentro = dentroDelHorario(h);
-  if (dentro) {
-    chip.className = 'horario-chip active';
-    chip.innerHTML = `✅ <strong>Sistema Activo</strong> — Horario: ${h.inicio} – ${h.fin}`;
-  } else {
-    chip.className = 'horario-chip inactive';
-    chip.innerHTML = `🔴 Fuera del horario de marcado: <strong>${h.inicio} – ${h.fin}</strong>`;
-  }
+  chip.className = 'horario-chip ' + (dentro ? 'active' : 'inactive');
+  chip.innerHTML = dentro
+    ? `✅ <strong>Sistema Activo</strong> &mdash; Horario: ${h.inicio} &ndash; ${h.fin}`
+    : `🔴 Fuera del horario de marcado: <strong>${h.inicio} &ndash; ${h.fin}</strong>`;
 }
 function getHorario() {
   try {
@@ -727,8 +693,8 @@ async function verificarAlumno() {
       url = `${SCRIPT_URL}?tipo=buscar_alumno&query=${encodeURIComponent(query)}`;
     }
 
-    const res  = await fetchConTimeout(url, 10000);
-    const data = await res.json();
+    // Usar JSONP para evitar bloqueo CORS desde GitHub Pages
+    const data = await fetchJsonp(url, 12000);
 
     if (!data || data.error || (!data.nombre && !data.nie)) {
       mostrarError('No se encontró ningún alumno con esos datos.');
