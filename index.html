@@ -550,14 +550,22 @@ function fetchGAS(url, timeoutMs) {
     document.head.appendChild(s);
   });
 
-  return Promise.any([p1, p2]).catch(() => { throw new Error('Sin conexión'); });
+  // Método 3: proxy CORS como último recurso si fetch y JSONP fallan
+  const p3 = fetch('https://corsproxy.io/?' + encodeURIComponent(cleanUrl), { cache: 'no-cache' })
+    .then(r => { if (!r.ok) throw new Error('proxy_' + r.status); return r.json(); });
+
+  return Promise.any([p1, p2, p3]).catch(() => { throw new Error('Sin conexión'); });
 }
 
 // ════════════════════════════════════════════════════════════
 // BLOQUEO POR DISPOSITIVO
 // ════════════════════════════════════════════════════════════
 function getHoyStr() {
-  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  // FIX: usar fecha LOCAL (no UTC) para evitar desfase en zona horaria El Salvador (UTC-6)
+  const d = new Date();
+  return d.getFullYear() + '-'
+    + String(d.getMonth() + 1).padStart(2, '0') + '-'
+    + String(d.getDate()).padStart(2, '0');
 }
 
 function dispositivoYaUsadoHoy() {
