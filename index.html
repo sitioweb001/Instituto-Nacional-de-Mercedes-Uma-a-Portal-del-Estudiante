@@ -504,7 +504,7 @@
         <div style="font-size:13px;color:var(--success-text);font-weight:600;">Asistencia registrada con éxito</div>
         <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" id="exito-hora">—</div>
       </div>
-      <button class="btn-validar" onclick="irA('v-login'); resetForm();" style="background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 20px rgba(79,142,247,0.35);">
+      <button class="btn-validar" onclick="volverAlInicio();" style="background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 20px rgba(79,142,247,0.35);">
         ← Volver al inicio
       </button>
     </div>
@@ -517,9 +517,66 @@
 // CONFIG
 // ════════════════════════════════════════════════════════════
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKnxasl94QOwaLx2QZMDNnfNG8NTtnWg1agE9shf9cyeYeP1PsgtUjbu4X94lXRSIM/exec";
+const PASS_OVERRIDE = "747-8"; // Contraseña para permitir marcado desde dispositivo ya usado
 const TECNICO = "";
+const DEVICE_KEY = 'inmu_device_used_today'; // localStorage key para bloqueo por dispositivo
 
-let alumnoActual = null;
+// ════════════════════════════════════════════════════════════
+// FETCH helper — fetch() primero (GAS soporta CORS), JSONP fallback
+// ════════════════════════════════════════════════════════════
+function fetchGAS(url, timeoutMs) {
+  timeoutMs = timeoutMs || 12000;
+  const cleanUrl = url.replace(/[&?]callback=[^&]*/g, '');
+
+  // Método 1: fetch normal
+  const p1 = new Promise((res, rej) => {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), timeoutMs - 2000);
+    fetch(cleanUrl, { signal: ctrl.signal, redirect: 'follow' })
+      .then(r => { clearTimeout(tid); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(res).catch(e => { clearTimeout(tid); rej(e); });
+  });
+
+  // Método 2: JSONP fallback
+  const p2 = new Promise((res, rej) => {
+    const cb = '__cb_' + Math.random().toString(36).slice(2);
+    const s  = document.createElement('script');
+    const tid = setTimeout(() => { cleanup(); rej(new Error('JSONP timeout')); }, timeoutMs);
+    function cleanup() { clearTimeout(tid); delete window[cb]; s.parentNode && s.parentNode.removeChild(s); }
+    window[cb] = d => { cleanup(); res(d); };
+    s.onerror  = () => { cleanup(); rej(new Error('JSONP error')); };
+    const sep = cleanUrl.indexOf('?') >= 0 ? '&' : '?';
+    s.src = cleanUrl + sep + 'callback=' + cb;
+    document.head.appendChild(s);
+  });
+
+  return Promise.any([p1, p2]).catch(() => { throw new Error('Sin conexión'); });
+}
+
+// ════════════════════════════════════════════════════════════
+// BLOQUEO POR DISPOSITIVO
+// ════════════════════════════════════════════════════════════
+function getHoyStr() {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+function dispositivoYaUsadoHoy() {
+  try {
+    const data = JSON.parse(localStorage.getItem(DEVICE_KEY) || 'null');
+    if (!data) return false;
+    return data.fecha === getHoyStr();
+  } catch(_) { return false; }
+}
+
+function marcarDispositivoUsado(nie, nombre) {
+  try {
+    localStorage.setItem(DEVICE_KEY, JSON.stringify({ fecha: getHoyStr(), nie, nombre }));
+  } catch(_) {}
+}
+
+function getDatosDispositivoHoy() {
+  try { return JSON.parse(localStorage.getItem(DEVICE_KEY) || 'null'); } catch(_) { return null; }
+}
 let expiraTimer  = null;
 let expirationDate = null;
 
@@ -700,6 +757,63 @@ async function verificarAlumno() {
   const query = (document.getElementById('input-doc').value || '').trim();
   if (!query) { notif('Ingresa tu NIE o datos.', 'error'); return; }
 
+  // ── Bloqueo por dispositivo ──────────────────────────────
+  if (dispositivoYaUsadoHoy()) {
+    const datos = getDatosDispositivoHoy();
+    const msg = datos
+      ? `Este dispositivo ya registró asistencia hoy (${datos.nombre || datos.nie}).`
+      : 'Este dispositivo ya fue usado para marcar asistencia hoy.';
+    mostrarModalDispositivo(msg, query);
+    return;
+  }
+
+  await _ejecutarVerificacion(query);
+}
+
+function mostrarModalDispositivo(msg, query) {
+  // Crear modal inline
+  let overlay = document.getElementById('modal-dispositivo');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'modal-dispositivo';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = `
+    <div style="background:var(--card-bg,#1a1f2e);border:1.5px solid var(--card-border,rgba(255,255,255,0.1));border-radius:20px;padding:28px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+      <div style="font-size:40px;margin-bottom:12px;">⚠️</div>
+      <div style="font-size:15px;font-weight:700;color:var(--warning-text,#fbbf24);margin-bottom:8px;">Dispositivo ya utilizado</div>
+      <div style="font-size:13px;color:var(--text-secondary,#8b949e);margin-bottom:20px;line-height:1.5;">${msg}<br><br>Si deseas enviar asistencia por un compañero, ingresa la contraseña de acceso.</div>
+      <input id="modal-pass-input" type="password" placeholder="Contraseña de acceso" autocomplete="off"
+        style="width:100%;padding:12px 14px;border:1.5px solid var(--input-border,rgba(255,255,255,0.12));border-radius:12px;background:var(--input-bg,#0d1117);color:var(--text-primary,#e6edf3);font-size:15px;outline:none;margin-bottom:12px;font-family:inherit;"
+        onkeydown="if(event.key==='Enter') _modalDispositivoConfirmar('${query.replace(/'/g,"\\'")}')">
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button onclick="_cerrarModalDispositivo()" style="flex:1;padding:12px;border:1.5px solid var(--card-border,rgba(255,255,255,0.1));border-radius:12px;background:transparent;color:var(--text-secondary,#8b949e);font-weight:700;cursor:pointer;font-size:14px;font-family:inherit;">Cancelar</button>
+        <button onclick="_modalDispositivoConfirmar('${query.replace(/'/g,"\\'")}') " style="flex:1;padding:12px;border:none;border-radius:12px;background:var(--accent,#4f8ef7);color:white;font-weight:700;cursor:pointer;font-size:14px;font-family:inherit;">Continuar</button>
+      </div>
+    </div>`;
+  overlay.style.display = 'flex';
+  setTimeout(() => { const i = document.getElementById('modal-pass-input'); if(i) i.focus(); }, 100);
+}
+
+function _cerrarModalDispositivo() {
+  const m = document.getElementById('modal-dispositivo');
+  if (m) m.style.display = 'none';
+}
+
+async function _modalDispositivoConfirmar(query) {
+  const pass = (document.getElementById('modal-pass-input') || {}).value || '';
+  if (pass !== PASS_OVERRIDE) {
+    notif('❌ Contraseña incorrecta.', 'error', 3000);
+    return;
+  }
+  _cerrarModalDispositivo();
+  // Marcar como override: resetear bloqueo para esta sesión
+  try { localStorage.removeItem(DEVICE_KEY); } catch(_) {}
+  await _ejecutarVerificacion(query);
+}
+
+async function _ejecutarVerificacion(query) {
   const tipo = document.getElementById('tipo-doc').value;
   const btn  = document.getElementById('btn-verificar');
   btn.disabled = true;
@@ -715,8 +829,7 @@ async function verificarAlumno() {
       url = `${SCRIPT_URL}?tipo=buscar_alumno&query=${encodeURIComponent(query)}`;
     }
 
-    // Usar JSONP para evitar bloqueo CORS desde GitHub Pages
-    const data = await fetchJsonp(url, 12000);
+    const data = await fetchGAS(url, 12000);
 
     if (!data || data.error || (!data.nombre && !data.nie)) {
       mostrarError('No se encontró ningún alumno con esos datos.');
@@ -724,7 +837,6 @@ async function verificarAlumno() {
       return;
     }
 
-    // Normalizar si viene de buscar_alumno (array o objeto)
     const alumno = Array.isArray(data) ? data[0] : data;
     if (!alumno || !alumno.nombre) {
       mostrarError('No se encontró ningún alumno con esos datos.');
@@ -734,14 +846,6 @@ async function verificarAlumno() {
 
     alumnoActual = alumno;
 
-    // ¿Ya marcó hoy?
-    if (alumno.marcado_hoy) {
-      mostrarYaMarcado(alumno);
-    } else {
-      mostrarResultadoOK(alumno);
-      habilitarValidacion();
-    }
-
     // Guardar en caché local
     try {
       const cache = JSON.parse(localStorage.getItem('cache_alumnos') || '[]');
@@ -750,8 +854,14 @@ async function verificarAlumno() {
       localStorage.setItem('cache_alumnos', JSON.stringify(cache.slice(-200)));
     } catch(_) {}
 
+    if (alumno.marcado_hoy) {
+      mostrarYaMarcado(alumno);
+    } else {
+      mostrarResultadoOK(alumno);
+      habilitarValidacion();
+    }
+
   } catch(e) {
-    // Fallback local
     const found = buscarEnLocal(query, tipo);
     if (found) {
       alumnoActual = found;
@@ -890,13 +1000,15 @@ async function validarAsistencia() {
 
   try {
     await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) });
-    // Respaldo local
     const key = `asist_${alumnoActual.nie}_${fechaStr.replace(/\//g,'_')}`;
     try { localStorage.setItem(key, JSON.stringify(payload)); } catch(_) {}
+    // Marcar dispositivo como usado hoy
+    marcarDispositivoUsado(alumnoActual.nie, alumnoActual.nombre);
     mostrarExito(alumnoActual, horaStr);
   } catch(e) {
     const key = `asist_offline_${alumnoActual.nie}_${Date.now()}`;
     try { localStorage.setItem(key, JSON.stringify(payload)); } catch(_) {}
+    marcarDispositivoUsado(alumnoActual.nie, alumnoActual.nombre);
     notif('⚠ Sin conexión. Asistencia guardada localmente.', 'info', 5000);
     mostrarExito(alumnoActual, horaStr);
   }
@@ -908,6 +1020,20 @@ function mostrarExito(alumno, hora) {
     `${alumno.grado || '—'} · Sección ${alumno.seccion || '—'}`;
   document.getElementById('exito-hora').textContent = `Hora: ${hora}`;
   irA('v-exito');
+}
+
+// ════════════════════════════════════════════════════════════
+// VOLVER AL INICIO — restaura el botón "Valida tu Asistencia"
+// ════════════════════════════════════════════════════════════
+function volverAlInicio() {
+  irA('v-login');
+  resetForm();
+  // Asegurar que el botón validar quede en su estado normal (no "Registrando...")
+  const btn = document.getElementById('btn-validar');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Valida tu Asistencia';
+  }
 }
 
 // ════════════════════════════════════════════════════════════
