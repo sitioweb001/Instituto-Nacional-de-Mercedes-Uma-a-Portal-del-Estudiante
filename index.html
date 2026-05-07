@@ -1006,18 +1006,24 @@ async function validarAsistencia() {
     hora:    horaStr
   };
 
+  // FIX: JSONP GET en lugar de POST (POST se pierde en redirect 302 de Google)
+  const urlMarcar = SCRIPT_URL
+    + '?tipo=marcar_alumno'
+    + '&nie='          + encodeURIComponent(alumnoActual.nie     || '')
+    + '&estado=presente'
+    + '&justificante=' + encodeURIComponent(payload.justificante || '');
+
   try {
-    await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) });
-    const key = `asist_${alumnoActual.nie}_${fechaStr.replace(/\//g,'_')}`;
+    const resp = await fetchGAS(urlMarcar, 15000);
+    const key  = `asist_${alumnoActual.nie}_${fechaStr.replace(/\\//g,'_')}`;
     try { localStorage.setItem(key, JSON.stringify(payload)); } catch(_) {}
-    // Marcar dispositivo como usado hoy
     marcarDispositivoUsado(alumnoActual.nie, alumnoActual.nombre);
-    mostrarExito(alumnoActual, horaStr);
+    mostrarExito(alumnoActual, (resp && resp.hora) || horaStr);
   } catch(e) {
     const key = `asist_offline_${alumnoActual.nie}_${Date.now()}`;
     try { localStorage.setItem(key, JSON.stringify(payload)); } catch(_) {}
     marcarDispositivoUsado(alumnoActual.nie, alumnoActual.nombre);
-    notif('⚠ Sin conexión. Asistencia guardada localmente.', 'info', 5000);
+    notif('⚠️ Sin conexión. Asistencia guardada localmente.', 'info', 5000);
     mostrarExito(alumnoActual, horaStr);
   }
 }
