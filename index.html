@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PERMANENCIA — Portal del Estudiante</title>
+<link rel="icon" type="image/jpeg" href="logo3.jpg">
+<link rel="apple-touch-icon" href="logo3.jpg">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -92,20 +94,7 @@
     transition: var(--trans);
     color: var(--text-primary);
   }
-  /* Marca de agua sutil en el fondo */
-  body::before {
-    content: '';
-    position: fixed;
-    bottom: 20px; right: 20px;
-    width: 120px; height: 120px;
-    background-image: url('marca de agua.svg');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: .06;
-    pointer-events: none;
-    z-index: 0;
-  }
+
 
   /* ── HEADER ── */
   .header {
@@ -191,7 +180,24 @@
     width: 100%;
     box-shadow: var(--shadow-card);
     transition: var(--trans);
+    position: relative;
+    overflow: hidden;
   }
+  /* Marca de agua dentro de cada card */
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('marca de agua.svg');
+    background-size: 75%;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: .12;
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* El contenido del card siempre encima */
+  .card > * { position: relative; z-index: 1; }
 
   /* ── SELECTOR TIPO DOCUMENTO ── */
   .field-label {
@@ -409,10 +415,10 @@
 <!-- HEADER -->
 <header class="header">
   <div class="header-left">
-    <img src="LOGODI.jpg"
+    <img src="logo3.jpg"
          alt="INMU Logo"
-         onerror="this.onerror=null;this.src='LOGODI2.jpg';"
-         style="width:44px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,0.3);">
+         onerror="this.onerror=null;this.src='LOGODI.jpg';"
+         style="height:48px;width:auto;max-width:56px;border-radius:10px;object-fit:contain;background:#fff;padding:4px;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,0.4);">
     <div class="header-text">
       <h1>INSTITUTO NACIONAL DE MERCEDES UMAÑA — 12623</h1>
       <p>Ministerio de Educación · Gobierno de El Salvador</p>
@@ -434,15 +440,15 @@
   <div class="view active" id="v-login">
 
     <div class="title-section">
-      <div style="display:flex;justify-content:center;gap:16px;align-items:center;margin-bottom:12px;">
-        <img src="logo.jpg"
+      <div style="display:flex;justify-content:center;gap:20px;align-items:center;margin-bottom:14px;">
+        <img src="logo3.jpg"
              alt="Logo INMU"
-             onerror="this.onerror=null;this.src='logo3.jpg';"
-             style="width:64px;height:64px;border-radius:16px;object-fit:cover;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+             onerror="this.onerror=null;this.src='LOGODI.jpg';"
+             style="width:72px;height:72px;border-radius:16px;object-fit:contain;background:#fff;padding:5px;box-shadow:0 6px 20px rgba(0,0,0,0.45);">
         <img src="Escudo_de_El_Salvador.svg"
              alt="Escudo El Salvador"
              onerror="this.style.display='none'"
-             style="width:56px;height:56px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4));">
+             style="width:64px;height:64px;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.5));">
       </div>
       <div class="title-badge"><span class="dot"></span> Sistema Activo</div>
       <div class="title-main">PERMANENCIA</div>
@@ -530,17 +536,10 @@
       <div class="title-sub">Tu asistencia fue validada correctamente</div>
     </div>
     <div class="card" style="text-align:center;">
-      <div style="display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:16px;">
-        <img src="LOGODI.jpg"
-             alt="INMU"
-             onerror="this.onerror=null;this.src='logo.jpg';"
-             style="width:56px;height:56px;border-radius:12px;object-fit:cover;box-shadow:0 2px 12px rgba(0,0,0,0.35);">
-        <div style="font-size:48px;">🎉</div>
-        <img src="Escudo_de_El_Salvador.svg"
-             alt="Escudo"
-             onerror="this.style.display='none'"
-             style="width:48px;height:48px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3));">
-      </div>
+      <img src="logo5.jpg"
+           alt="INMU"
+           onerror="this.onerror=null;this.src='logo3.jpg';"
+           style="width:90px;height:90px;border-radius:18px;object-fit:contain;background:#fff;padding:6px;box-shadow:0 6px 24px rgba(0,0,0,0.35);margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;">
       <div style="font-size:18px;font-weight:800;color:var(--text-primary);margin-bottom:6px;" id="exito-nombre">—</div>
       <div style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;" id="exito-info">—</div>
       <div style="background:var(--success-bg);border:1px solid var(--success-border);border-radius:12px;padding:14px;margin-bottom:20px;">
@@ -554,6 +553,17 @@
   </div>
 
 </div><!-- /page-body -->
+
+<!-- FOOTER CON LOGO2 -->
+<footer style="width:100%;display:flex;flex-direction:column;align-items:center;padding:24px 16px 32px;margin-top:auto;gap:8px;">
+  <img src="logo2.svg"
+       alt="Logo MINED"
+       onerror="this.style.display='none'"
+       style="height:52px;width:auto;opacity:.85;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.25));">
+  <p style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px;">
+    Instituto Nacional de Mercedes Umaña · Sistema de Permanencia
+  </p>
+</footer>
 
 <script>
 // ════════════════════════════════════════════════════════════
