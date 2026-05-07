@@ -406,6 +406,22 @@
   /* ── VIEWS ── */
   .view { display: none; }
   .view.active { display: block; }
+
+  /* ── Logos SVG: invertir en modo oscuro para que se vean blancos ── */
+  [data-theme="dark"] img[src*=".svg"],
+  [data-theme="dark"] img[src*="svg"] {
+    filter: brightness(0) invert(1) drop-shadow(0 2px 6px rgba(255,255,255,0.15));
+  }
+  /* logo2.svg en footer — efecto suave en oscuro */
+  [data-theme="dark"] footer img[src*="logo2"] {
+    filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(255,255,255,0.2));
+    opacity: 0.9;
+  }
+  /* En modo claro los SVGs se ven normales */
+  [data-theme="light"] img[src*=".svg"],
+  [data-theme="light"] img[src*="svg"] {
+    filter: none;
+  }
 </style>
 </head>
 <body>
@@ -428,7 +444,7 @@
     <img src="Escudo_de_El_Salvador.svg"
          alt="Escudo El Salvador"
          onerror="this.style.display='none'"
-         style="width:32px;height:32px;opacity:.85;">
+         style="width:46px;height:46px;opacity:.85;">
     <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
   </div>
 </header>
@@ -440,11 +456,15 @@
   <div class="view active" id="v-login">
 
     <div class="title-section">
-      <div style="display:flex;justify-content:center;gap:60px;align-items:center;margin-bottom:40px;">
+      <div style="display:flex;justify-content:center;gap:20px;align-items:center;margin-bottom:14px;">
+        <img src="logo3.jpg"
+             alt="Logo INMU"
+             onerror="this.onerror=null;this.src='LOGODI.jpg';"
+             style="width:72px;height:72px;border-radius:16px;object-fit:contain;background:#fff;padding:5px;box-shadow:0 6px 20px rgba(0,0,0,0.45);">
         <img src="Escudo_de_El_Salvador.svg"
              alt="Escudo El Salvador"
              onerror="this.style.display='none'"
-             style="width:80px;height:75px;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.5));">
+             style="width:93px;height:93px;">
       </div>
       <div class="title-badge"><span class="dot"></span> Sistema Activo</div>
       <div class="title-main">PERMANENCIA</div>
@@ -551,12 +571,12 @@
 </div><!-- /page-body -->
 
 <!-- FOOTER CON LOGO2 -->
-<footer style="width:100%;display:flex;flex-direction:column;align-items:center;padding:50px 34px 45px;margin-top:auto;gap:12px;">
+<footer style="width:100%;display:flex;flex-direction:column;align-items:center;padding:24px 16px 32px;margin-top:auto;gap:8px;">
   <img src="logo2.svg"
        alt="Logo MINED"
        onerror="this.style.display='none'"
-       style="height:100px;width:auto;opacity:.85;filter:drop-shadow(0 5px 10px rgba(0,0,0,0.25));">
-  <p style="font-size:20px;color:var(--text-muted);text-align:center;margin-top:4px;">
+       style="height:68px;width:auto;opacity:.85;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.25));">
+  <p style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px;font-size:11px;">
     Instituto Nacional de Mercedes Umaña · Sistema de Permanencia
   </p>
 </footer>
