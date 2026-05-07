@@ -140,7 +140,7 @@
   /* ── TITLE SECTION ── */
   .title-section {
     text-align: center;
-    margin-bottom: 28px;
+    margin-bottom: 30px;
     width: 100%;
   }
   .title-badge {
@@ -193,8 +193,15 @@
     background-repeat: no-repeat;
     background-position: center;
     opacity: .12;
+    filter: var(--wm-filter, none);
     pointer-events: none;
     z-index: 0;
+  }
+  [data-theme="dark"] .card::after {
+    --wm-filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(255,255,255,0.10));
+  }
+  [data-theme="light"] .card::after {
+    --wm-filter: none;
   }
   /* El contenido del card siempre encima */
   .card > * { position: relative; z-index: 1; }
@@ -434,7 +441,7 @@
     <img src="logo3.jpg"
          alt="INMU Logo"
          onerror="this.onerror=null;this.src='LOGODI.jpg';"
-         style="height:48px;width:auto;max-width:56px;border-radius:10px;object-fit:contain;background:#fff;padding:4px;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,0.4);">
+         style="height:58px;width:auto;max-width:68px;border-radius:12px;object-fit:contain;background:#fff;padding:5px;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,0.4);">
     <div class="header-text">
       <h1>INSTITUTO NACIONAL DE MERCEDES UMAÑA — 12623</h1>
       <p>Ministerio de Educación · Gobierno de El Salvador</p>
@@ -444,7 +451,7 @@
     <img src="Escudo_de_El_Salvador.svg"
          alt="Escudo El Salvador"
          onerror="this.style.display='none'"
-         style="width:46px;height:46px;opacity:.85;">
+         style="width:58px;height:58px;opacity:.9;">
     <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
   </div>
 </header>
@@ -456,15 +463,11 @@
   <div class="view active" id="v-login">
 
     <div class="title-section">
-      <div style="display:flex;justify-content:center;gap:20px;align-items:center;margin-bottom:14px;">
-        <img src="logo3.jpg"
-             alt="Logo INMU"
-             onerror="this.onerror=null;this.src='LOGODI.jpg';"
-             style="width:72px;height:72px;border-radius:16px;object-fit:contain;background:#fff;padding:5px;box-shadow:0 6px 20px rgba(0,0,0,0.45);">
+      <div style="display:flex;justify-content:center;align-items:center;margin-bottom:14px;">
         <img src="Escudo_de_El_Salvador.svg"
              alt="Escudo El Salvador"
              onerror="this.style.display='none'"
-             style="width:93px;height:93px;">
+             style="width:128px;height:128px;">
       </div>
       <div class="title-badge"><span class="dot"></span> Sistema Activo</div>
       <div class="title-main">PERMANENCIA</div>
@@ -555,7 +558,7 @@
       <img src="logo5.jpg"
            alt="INMU"
            onerror="this.onerror=null;this.src='logo3.jpg';"
-           style="width:90px;height:90px;border-radius:18px;object-fit:contain;background:#fff;padding:6px;box-shadow:0 6px 24px rgba(0,0,0,0.35);margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;">
+           style="width:116px;height:116px;border-radius:22px;object-fit:contain;background:#fff;padding:8px;box-shadow:0 8px 28px rgba(0,0,0,0.35);margin-bottom:18px;display:block;margin-left:auto;margin-right:auto;">
       <div style="font-size:18px;font-weight:800;color:var(--text-primary);margin-bottom:6px;" id="exito-nombre">—</div>
       <div style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;" id="exito-info">—</div>
       <div style="background:var(--success-bg);border:1px solid var(--success-border);border-radius:12px;padding:14px;margin-bottom:20px;">
@@ -575,7 +578,7 @@
   <img src="logo2.svg"
        alt="Logo MINED"
        onerror="this.style.display='none'"
-       style="height:68px;width:auto;opacity:.85;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.25));">
+       style="height:138px;max-width:90vw;width:auto;opacity:.9;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.25));">
   <p style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px;font-size:11px;">
     Instituto Nacional de Mercedes Umaña · Sistema de Permanencia
   </p>
