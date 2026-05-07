@@ -524,6 +524,55 @@ const DEVICE_KEY = 'inmu_device_used_today'; // localStorage key para bloqueo po
 // ════════════════════════════════════════════════════════════
 // FETCH helper — fetch() primero (GAS soporta CORS), JSONP fallback
 // ════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+// CACHÉ LOCAL — respuesta instantánea desde localStorage mientras el servidor responde
+// ══════════════════════════════════════════════════════════════════════════════
+
+const GAS_CACHE_PREFIX = 'gas_cache_';
+const GAS_CACHE_TTL    = 8 * 60 * 1000; // 8 minutos en ms
+
+function gasCache_get(url) {
+  try {
+    const key  = GAS_CACHE_PREFIX + btoa(url).slice(0, 80);
+    const item = JSON.parse(localStorage.getItem(key) || 'null');
+    if (!item || Date.now() - item.ts > GAS_CACHE_TTL) return null;
+    return item.data;
+  } catch(e) { return null; }
+}
+
+function gasCache_set(url, data) {
+  try {
+    const key = GAS_CACHE_PREFIX + btoa(url).slice(0, 80);
+    localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+  } catch(e) {}
+}
+
+function gasCache_invalidate(prefix) {
+  try {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith(GAS_CACHE_PREFIX) && (!prefix || k.includes(prefix)))
+      .forEach(k => localStorage.removeItem(k));
+  } catch(e) {}
+}
+
+// fetchGAS con stale-while-revalidate:
+// 1) Devuelve caché local INMEDIATAMENTE si existe (respuesta instantánea)
+// 2) En paralelo actualiza el caché desde el servidor
+async function fetchGASCached(url, timeoutMs, forceRefresh) {
+  const cached = forceRefresh ? null : gasCache_get(url);
+  if (cached !== null) {
+    // Actualizar en background sin bloquear
+    fetchGAS(url, timeoutMs).then(fresh => {
+      if (fresh) gasCache_set(url, fresh);
+    }).catch(() => {});
+    return cached;
+  }
+  // Sin caché: esperar al servidor
+  const data = await fetchGAS(url, timeoutMs || 15000);
+  if (data) gasCache_set(url, data);
+  return data;
+}
+
 function fetchGAS(url, timeoutMs) {
   timeoutMs = timeoutMs || 12000;
   const cleanUrl = url.replace(/[&?]callback=[^&]*/g, '');
@@ -837,7 +886,7 @@ async function _ejecutarVerificacion(query) {
       url = `${SCRIPT_URL}?tipo=buscar_alumno&query=${encodeURIComponent(query)}`;
     }
 
-    const data = await fetchGAS(url, 12000);
+    const data = await fetchGASCached(url, 12000);
 
     if (!data || data.error || (!data.nombre && !data.nie)) {
       mostrarError('No se encontró ningún alumno con esos datos.');
@@ -1018,6 +1067,7 @@ async function validarAsistencia() {
     const key  = `asist_${alumnoActual.nie}_${fechaStr.replace(/\\//g,'_')}`;
     try { localStorage.setItem(key, JSON.stringify(payload)); } catch(_) {}
     marcarDispositivoUsado(alumnoActual.nie, alumnoActual.nombre);
+    gasCache_invalidate(); // limpiar caché para que la próxima verificación sea fresca
     mostrarExito(alumnoActual, (resp && resp.hora) || horaStr);
   } catch(e) {
     const key = `asist_offline_${alumnoActual.nie}_${Date.now()}`;
