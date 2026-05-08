@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d1117">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>PERMANENCIA — Portal del Estudiante</title>
+<link rel="icon" type="image/jpeg" href="logo3.jpg">
+<link rel="apple-touch-icon" href="logo3.jpg">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  /* ── TOKENS ── */
+  :root {
+    --radius-card: 20px;
+    --radius-btn:  14px;
+    --radius-input: 14px;
+    --accent:  #4f8ef7;
+    --accent2: #3b7de8;
+    --green:   #22c55e;
+    --green-bg:#16a34a;
+    --amber:   #f59e0b;
+    --red:     #ef4444;
+    --trans: all .25s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── DARK THEME (default) ── */
+  [data-theme="dark"] {
+    --bg:        #0d1117;
+    --bg2:       #161b22;
+    --card-bg:   #1a1f2e;
+    --card-border: rgba(255,255,255,0.07);
+    --input-bg:  #0d1117;
+    --input-border: rgba(255,255,255,0.12);
+    --input-border-focus: var(--accent);
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted:    #6e7681;
+    --header-bg: rgba(13,17,23,0.85);
+    --header-border: rgba(255,255,255,0.07);
+    --verify-bg: #1c2333;
+    --success-bg: rgba(34,197,94,0.12);
+    --success-border: rgba(34,197,94,0.3);
+    --success-text: #4ade80;
+    --warning-bg: rgba(245,158,11,0.12);
+    --warning-border: rgba(245,158,11,0.3);
+    --warning-text: #fbbf24;
+    --badge-bg: rgba(79,142,247,0.12);
+    --badge-text: #7eb8f7;
+    --divider: rgba(255,255,255,0.07);
+    --btn-secondary-bg: rgba(255,255,255,0.06);
+    --btn-secondary-text: #8b949e;
+    --shadow: 0 20px 60px rgba(0,0,0,0.6);
+    --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  /* ── LIGHT THEME ── */
+  [data-theme="light"] {
+    --bg:        #f0f4f8;
+    --bg2:       #e2e8f0;
+    --card-bg:   #ffffff;
+    --card-border: rgba(0,0,0,0.08);
+    --input-bg:  #f8fafc;
+    --input-border: #d1d5db;
+    --input-border-focus: var(--accent2);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted:    #94a3b8;
+    --header-bg: rgba(255,255,255,0.9);
+    --header-border: rgba(0,0,0,0.08);
+    --verify-bg: #eff6ff;
+    --success-bg: rgba(34,197,94,0.08);
+    --success-border: rgba(34,197,94,0.35);
+    --success-text: #15803d;
+    --warning-bg: rgba(245,158,11,0.1);
+    --warning-border: rgba(245,158,11,0.35);
+    --warning-text: #b45309;
+    --badge-bg: #eff6ff;
+    --badge-text: #1d4ed8;
+    --divider: rgba(0,0,0,0.07);
+    --btn-secondary-bg: #f1f5f9;
+    --btn-secondary-text: #64748b;
+    --shadow: 0 20px 60px rgba(0,0,0,0.1);
+    --shadow-card: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center;
+    transition: var(--trans);
+    color: var(--text-primary);
+  }
+
+
+  /* ── HEADER ── */
+  .header {
+    width: 100%;
+    background: var(--header-bg);
+    border-bottom: 1px solid var(--header-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 12px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    transition: var(--trans);
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header-logo {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: linear-gradient(135deg,#1a3a6e,#0c2a5a);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+  .header-text h1 { font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+  .header-text p  { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+  .btn-theme {
+    background: var(--btn-secondary-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 8px 10px;
+    cursor: pointer; font-size: 18px; line-height: 1;
+    transition: var(--trans); flex-shrink: 0;
+    color: var(--text-secondary);
+  }
+  .btn-theme:hover { opacity: .8; }
+
+  /* ── BODY WRAPPER ── */
+  .page-body {
+    width: 100%; max-width: 440px;
+    padding: 28px 16px 60px;
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+  }
+
+  /* ── TITLE SECTION ── */
+  .title-section {
+    text-align: center;
+    margin-bottom: 30px;
+    width: 100%;
+  }
+  .title-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--badge-bg);
+    color: var(--badge-text);
+    border: 1px solid rgba(79,142,247,0.2);
+    border-radius: 20px; padding: 5px 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .title-badge .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .5; transform: scale(.8); }
+  }
+  .title-main {
+    font-size: 30px; font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -.02em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .title-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .title-sub strong { color: var(--text-primary); }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-card);
+    padding: 28px 24px;
+    width: 100%;
+    box-shadow: var(--shadow-card);
+    transition: var(--trans);
+    position: relative;
+    overflow: hidden;
+  }
+  /* Marca de agua dentro de cada card */
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('marca de agua.svg');
+    background-size: 75%;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: .12;
+    filter: var(--wm-filter, none);
+    pointer-events: none;
+    z-index: 0;
+  }
+  [data-theme="dark"] .card::after {
+    --wm-filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(255,255,255,0.10));
+  }
+  [data-theme="light"] .card::after {
+    --wm-filter: none;
+  }
+  /* El contenido del card siempre encima */
+  .card > * { position: relative; z-index: 1; }
+
+  /* ── SELECTOR TIPO DOCUMENTO ── */
+  .field-label {
+    font-size: 11px; font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: 8px; margin-top: 20px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .field-label:first-child { margin-top: 0; }
+  .field-label .req { color: var(--red); margin-right: 2px; }
+
+  select.campo, input.campo {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1.5px solid var(--input-border);
+    border-radius: var(--radius-input);
+    padding: 14px 16px;
+    font-size: 16px; font-family: inherit;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    -webkit-appearance: none; appearance: none;
+  }
+  select.campo {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b949e' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+  }
+  [data-theme="light"] select.campo {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+  select.campo:focus, input.campo:focus {
+    border-color: var(--input-border-focus);
+    box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
+  }
+  input.campo::placeholder { color: var(--text-muted); }
+
+  /* ── NIE ROW ── */
+  .nie-row { display: flex; gap: 10px; }
+  .nie-row input { flex: 1; }
+
+  /* ── BTN VERIFICAR ── */
+  .btn-verificar {
+    background: var(--accent);
+    color: white; border: none;
+    border-radius: var(--radius-input);
+    padding: 14px 20px;
+    font-size: 15px; font-weight: 700; font-family: inherit;
+    cursor: pointer; white-space: nowrap;
+    transition: background .2s, transform .1s;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .btn-verificar:hover:not(:disabled) { background: var(--accent2); }
+  .btn-verificar:active { transform: scale(.97); }
+  .btn-verificar:disabled { opacity: .55; cursor: default; }
+
+  /* ── RESULTADO VERIFICACIÓN ── */
+  .result-box {
+    border-radius: 12px; padding: 16px;
+    margin-top: 16px; display: none;
+    animation: fadeSlide .3s ease;
+  }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .result-box.success {
+    background: var(--success-bg);
+    border: 1.5px solid var(--success-border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .result-box.error {
+    background: rgba(239,68,68,0.1);
+    border: 1.5px solid rgba(239,68,68,0.3);
+    display: block;
+  }
+  .result-box.warning {
+    background: var(--warning-bg);
+    border: 1.5px solid var(--warning-border);
+    display: block;
+  }
+  .result-check {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(34,197,94,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .result-name {
+    font-size: 15px; font-weight: 700;
+    color: var(--success-text);
+    text-transform: uppercase; line-height: 1.3;
+  }
+  .result-sub {
+    font-size: 12px; color: var(--text-secondary);
+    margin-top: 2px;
+  }
+  .result-error-text {
+    font-size: 14px; color: var(--red);
+    font-weight: 600;
+  }
+  .result-warning-text {
+    font-size: 14px; color: var(--warning-text);
+    font-weight: 600;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px; background: var(--divider);
+    margin: 20px 0;
+  }
+  .divider-label {
+    display: flex; align-items: center; gap: 10px;
+    margin: 20px 0; color: var(--text-muted); font-size: 12px;
+  }
+  .divider-label::before, .divider-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--divider);
+  }
+
+  /* ── BTN VALIDAR ── */
+  .btn-validar {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white; border: none;
+    border-radius: var(--radius-btn);
+    font-size: 17px; font-weight: 800; font-family: inherit;
+    cursor: pointer; letter-spacing: .01em;
+    transition: opacity .2s, transform .1s;
+    box-shadow: 0 4px 20px rgba(245,158,11,0.35);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-validar:hover:not(:disabled) { opacity: .9; }
+  .btn-validar:active { transform: scale(.98); }
+  .btn-validar:disabled { opacity: .45; cursor: default; box-shadow: none; }
+
+  /* ── EXPIRA ── */
+  .expira-text {
+    text-align: center; font-size: 12px; color: var(--text-muted);
+    margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+
+  /* ── YA MARCADO ── */
+  .ya-marcado-box {
+    background: var(--warning-bg);
+    border: 1.5px solid var(--warning-border);
+    border-radius: 12px; padding: 16px;
+    text-align: center; margin-top: 16px;
+    display: none;
+  }
+  .ya-marcado-box .ym-icon { font-size: 28px; margin-bottom: 6px; }
+  .ya-marcado-box .ym-title {
+    font-size: 15px; font-weight: 700;
+    color: var(--warning-text);
+  }
+  .ya-marcado-box .ym-sub {
+    font-size: 12px; color: var(--text-secondary); margin-top: 4px;
+  }
+
+  /* ── SPINNER ── */
+  .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2.5px solid rgba(255,255,255,.3);
+    border-top-color: white; border-radius: 50%;
+    animation: spin .6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── NOTIF ── */
+  #notif {
+    position: fixed; top: 72px; left: 50%; transform: translateX(-50%);
+    padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 14px;
+    color: white; z-index: 9999; display: none;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+    max-width: 360px; width: calc(100% - 32px); text-align: center;
+    animation: notifIn .25s ease;
+  }
+  @keyframes notifIn {
+    from { opacity: 0; transform: translate(-50%, -8px); }
+    to   { opacity: 1; transform: translate(-50%, 0); }
+  }
+  .notif-ok    { background: var(--green-bg); }
+  .notif-error { background: var(--red); }
+  .notif-info  { background: var(--accent); }
+
+  /* ── HORARIO CHIP ── */
+  .horario-chip {
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 12px; font-weight: 600;
+    margin-bottom: 20px; text-align: center;
+    transition: var(--trans);
+  }
+  .horario-chip.active {
+    background: var(--success-bg); color: var(--success-text);
+    border: 1px solid var(--success-border);
+  }
+  .horario-chip.inactive {
+    background: rgba(239,68,68,.1); color: var(--red);
+    border: 1px solid rgba(239,68,68,.25);
+  }
+  .horario-chip.loading {
+    background: var(--btn-secondary-bg); color: var(--text-muted);
+    border: 1px solid var(--card-border);
+  }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── Logos SVG: invertir en modo oscuro para que se vean blancos ── */
+  [data-theme="dark"] img[src*=".svg"],
+  [data-theme="dark"] img[src*="svg"] {
+    filter: brightness(0) invert(1) drop-shadow(0 2px 6px rgba(255,255,255,0.15));
+  }
+  /* logo2.svg en footer — efecto suave en oscuro */
+  [data-theme="dark"] footer img[src*="logo2"] {
+    filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(255,255,255,0.2));
+    opacity: 0.9;
+  }
+  /* En modo claro los SVGs se ven normales */
+  [data-theme="light"] img[src*=".svg"],
+  [data-theme="light"] img[src*="svg"] {
+    filter: none;
+  }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PANTALLA COMPLETA DE BLOQUEO — PWA / MANTENIMIENTO / ALUMNOS OFF
+   No altera el diseño original: solo se muestra cuando el backend lo indica.
+═══════════════════════════════════════════════════════════════ */
+#pantalla-bloqueo-pwa {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background:
+    radial-gradient(circle at top, rgba(79,142,247,0.16), transparent 34%),
+    linear-gradient(135deg, #020617 0%, #0d1117 46%, #111827 100%);
+  color: #f8fafc;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 28px 18px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#pantalla-bloqueo-pwa .bloqueo-card {
+  width: min(440px, 100%);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.76);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 30px 24px;
+  position: relative;
+  overflow: hidden;
+}
+#pantalla-bloqueo-pwa .bloqueo-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('marca de agua.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 75%;
+  opacity: .08;
+  filter: brightness(0) invert(1);
+  pointer-events: none;
+}
+#pantalla-bloqueo-pwa .bloqueo-content { position: relative; z-index: 1; }
+#pantalla-bloqueo-pwa .bloqueo-logo {
+  width: 118px;
+  height: 118px;
+  object-fit: contain;
+  margin: 0 auto 14px;
+  display: block;
+  filter: brightness(0) invert(1) drop-shadow(0 4px 14px rgba(255,255,255,.16));
+}
+#pantalla-bloqueo-pwa .bloqueo-icono {
+  font-size: 58px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+#pantalla-bloqueo-pwa .bloqueo-titulo {
+  font-size: 27px;
+  line-height: 1.08;
+  font-weight: 900;
+  letter-spacing: -.03em;
+  margin: 8px 0 10px;
+  text-transform: uppercase;
+}
+#pantalla-bloqueo-pwa .bloqueo-texto {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #cbd5e1;
+  margin: 0 0 18px;
+}
+#pantalla-bloqueo-pwa .bloqueo-alerta {
+  border-radius: 15px;
+  padding: 14px 15px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+  margin: 16px 0 16px;
+}
+#pantalla-bloqueo-pwa .bloqueo-alerta.rojo {
+  background: rgba(239,68,68,.15);
+  border: 1.5px solid rgba(239,68,68,.45);
+  color: #fecaca;
+}
+#pantalla-bloqueo-pwa .bloqueo-alerta.ambar {
+  background: rgba(245,158,11,.16);
+  border: 1.5px solid rgba(245,158,11,.48);
+  color: #fde68a;
+}
+#pantalla-bloqueo-pwa .bloqueo-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+#pantalla-bloqueo-pwa .bloqueo-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 13px 16px;
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .12s ease, opacity .2s ease;
+}
+#pantalla-bloqueo-pwa .bloqueo-btn:active { transform: scale(.98); }
+#pantalla-bloqueo-pwa .bloqueo-btn.admin {
+  background: linear-gradient(135deg, #4f8ef7, #3b7de8);
+  color: white;
+}
+#pantalla-bloqueo-pwa .bloqueo-btn.reload {
+  background: rgba(255,255,255,.08);
+  color: #cbd5e1;
+  border: 1px solid rgba(255,255,255,.12);
+}
+#pantalla-bloqueo-pwa .bloqueo-footer {
+  margin-top: 18px;
+  font-size: 10.5px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+@media (display-mode: standalone) {
+  #pantalla-bloqueo-pwa { padding-top: max(28px, env(safe-area-inset-top)); }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     OVERLAY FULLSCREEN: Bloqueo PWA / mantenimiento / portal alumnos off
+═══════════════════════════════════════════════════════════════ -->
+<div id="pantalla-bloqueo-pwa" role="dialog" aria-modal="true" aria-labelledby="bloqueo-pwa-titulo">
+  <div class="bloqueo-card">
+    <div class="bloqueo-content">
+      <img src="logo2.svg" alt="Logo institucional" class="bloqueo-logo" onerror="this.style.display='none'">
+      <div class="bloqueo-icono" id="bloqueo-pwa-icono">🔒</div>
+      <div class="bloqueo-titulo" id="bloqueo-pwa-titulo">Sistema bloqueado</div>
+      <p class="bloqueo-texto" id="bloqueo-pwa-texto">Verificando estado del sistema...</p>
+      <div class="bloqueo-alerta rojo" id="bloqueo-pwa-alerta">Acceso restringido</div>
+      <div class="bloqueo-botones">
+        <button type="button" class="bloqueo-btn admin" onclick="desbloqueoTemporalPWA()">🔑 Código administrativo</button>
+        <button type="button" class="bloqueo-btn reload" onclick="location.reload()">🔄 Volver a verificar</button>
+      </div>
+      <div class="bloqueo-footer">Instituto Nacional de Mercedes Umaña · Sistema de Permanencia</div>
+    </div>
+  </div>
+</div>
+
+
+<div id="notif"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <img src="logo3.jpg"
+         alt="INMU Logo"
+         onerror="this.onerror=null;this.src='LOGODI.jpg';"
+         style="height:58px;width:auto;max-width:68px;border-radius:12px;object-fit:contain;background:#fff;padding:5px;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,0.4);">
+    <div class="header-text">
+      <h1>INSTITUTO NACIONAL DE MERCEDES UMAÑA — 12623</h1>
+      <p>Ministerio de Educación · Gobierno de El Salvador</p>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+    <img src="Escudo_de_El_Salvador.svg"
+         alt="Escudo El Salvador"
+         onerror="this.style.display='none'"
+         style="width:58px;height:58px;opacity:.9;">
+    <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+  </div>
+</header>
+
+<!-- BODY -->
+<div class="page-body">
+
+  <!-- ══ VISTA LOGIN ══ -->
+  <div class="view active" id="v-login">
+
+    <div class="title-section">
+      <div style="display:flex;justify-content:center;align-items:center;margin-bottom:14px;">
+        <img src="Escudo_de_El_Salvador.svg"
+             alt="Escudo El Salvador"
+             onerror="this.style.display='none'"
+             style="width:128px;height:128px;">
+      </div>
+      <div class="title-badge"><span class="dot"></span> Sistema Activo</div>
+      <div class="title-main">PERMANENCIA</div>
+      <div class="title-sub">
+        ASISTENCIA VIRTUAL<br>
+        <strong id="fecha-hoy">—</strong>
+      </div>
+      <div class="title-sub" style="margin-top:8px;">
+         <strong id="tecnico-nombre"></strong>
+      </div>
+    </div>
+
+    <!-- Banner estado sistema -->
+    <div id="sistema-banner" style="display:none;border-radius:14px;padding:16px 18px;margin-bottom:14px;gap:12px;align-items:center;font-size:13px;line-height:1.5;"></div>
+
+    <div id="card-verificar">
+    <div class="card">
+
+      <!-- Horario chip -->
+      <div class="horario-chip loading" id="horario-chip">⏰ Verificando sistema...</div>
+
+      <!-- Separador -->
+      <div class="divider-label">Verifica tu asistencia</div>
+
+      <!-- Tipo documento -->
+      <div class="field-label"><span class="req">*</span> Tipo de documento</div>
+      <select class="campo" id="tipo-doc" onchange="onTipoChange()">
+        <option value="nie">NIE</option>
+
+      </select>
+
+      <!-- NIE / Documento -->
+      <div class="field-label" style="margin-top:16px;"><span class="req">*</span> <span id="lbl-campo">NIE</span></div>
+      <div class="nie-row">
+        <input class="campo" type="text" id="input-doc"
+          placeholder="Ej: 19910934"
+          autocomplete="off" autocorrect="off" spellcheck="false"
+          inputmode="numeric"
+          onkeydown="if(event.key==='Enter') verificarAlumno()">
+        <button class="btn-verificar" id="btn-verificar" onclick="verificarAlumno()">
+          Verificar
+        </button>
+      </div>
+
+      <!-- Resultado verificación -->
+      <div class="result-box" id="result-box">
+        <div class="result-check">✅</div>
+        <div>
+          <div class="result-name" id="result-nombre">—</div>
+          <div class="result-sub" id="result-sub">Identificado correctamente. Ahora puedes validar tu asistencia.</div>
+        </div>
+      </div>
+
+      <!-- Error verificación -->
+      <div class="result-box error" id="result-error" style="display:none;">
+        <div class="result-error-text" id="result-error-text">No se encontró ningún alumno.</div>
+      </div>
+
+      <!-- Ya marcado hoy -->
+      <div class="ya-marcado-box" id="ya-marcado-box">
+        <div class="ym-icon">✅</div>
+        <div class="ym-title" id="ym-title">Ya registraste tu asistencia hoy</div>
+        <div class="ym-sub" id="ym-sub">Tu presencia fue marcada correctamente.</div>
+      </div>
+
+      <!-- Botón validar -->
+      <div style="margin-top:20px;">
+        <button class="btn-validar" id="btn-validar" onclick="validarAsistencia()" disabled>
+          Valida tu Asistencia
+        </button>
+        <div class="expira-text" id="expira-text" style="display:none;">
+          ⏱ Expira: <span id="expira-val">—</span>
+        </div>
+      </div>
+
+    </div>
+    </div><!-- /card-verificar -->
+  </div>
+
+  <!-- ══ VISTA ÉXITO ══ -->
+  <div class="view" id="v-exito">
+    <div class="title-section">
+      <div class="title-badge"><span class="dot"></span> Registrado</div>
+      <div class="title-main" style="color:var(--success-text);">✅ PRESENTE</div>
+      <div class="title-sub">Tu asistencia fue validada correctamente</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <img src="logo5.jpg"
+           alt="INMU"
+           onerror="this.onerror=null;this.src='logo3.jpg';"
+           style="width:116px;height:116px;border-radius:22px;object-fit:contain;background:#fff;padding:8px;box-shadow:0 8px 28px rgba(0,0,0,0.35);margin-bottom:18px;display:block;margin-left:auto;margin-right:auto;">
+      <div style="font-size:18px;font-weight:800;color:var(--text-primary);margin-bottom:6px;" id="exito-nombre">—</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;" id="exito-info">—</div>
+      <div style="background:var(--success-bg);border:1px solid var(--success-border);border-radius:12px;padding:14px;margin-bottom:20px;">
+        <div style="font-size:13px;color:var(--success-text);font-weight:600;">Asistencia registrada con éxito</div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" id="exito-hora">—</div>
+      </div>
+      <button class="btn-validar" onclick="volverAlInicio();" style="background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 20px rgba(79,142,247,0.35);">
+        ← Volver al inicio
+      </button>
+    </div>
+  </div>
+
+</div><!-- /page-body -->
+
+<!-- FOOTER CON LOGO2 -->
+<footer style="width:100%;display:flex;flex-direction:column;align-items:center;padding:24px 16px 32px;margin-top:auto;gap:8px;">
+  <img src="logo2.svg"
+       alt="Logo MINED"
+       onerror="this.style.display='none'"
+       style="height:138px;max-width:90vw;width:auto;opacity:.9;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.25));">
+  <p style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px;font-size:11px;">
+    Instituto Nacional de Mercedes Umaña · Sistema de Permanencia
+  </p>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════════════
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKnxasl94QOwaLx2QZMDNnfNG8NTtnWg1agE9shf9cyeYeP1PsgtUjbu4X94lXRSIM/exec";
+const PASS_OVERRIDE = "747-8"; // Contraseña para permitir marcado desde dispositivo ya usado
+const TECNICO = "";
+const DEVICE_KEY = 'inmu_device_used_today'; // localStorage key para bloqueo por dispositivo
+
+// ════════════════════════════════════════════════════════════
+// BLOQUEO FULLSCREEN PWA — mantenimiento / alumnos desactivado
+// Desbloqueo temporal: solo dura esta pestaña/sesión.
+// ════════════════════════════════════════════════════════════
+const PWA_UNLOCK_KEY = 'inmu_pwa_unlock_temporal';
+function pwaEstaDesbloqueadoTemporalmente() {
+  try { return sessionStorage.getItem(PWA_UNLOCK_KEY) === 'true'; } catch(_) { return false; }
+}
+function mostrarBloqueoPWA(tipo) {
+  if (pwaEstaDesbloqueadoTemporalmente()) return;
+  const overlay = document.getElementById('pantalla-bloqueo-pwa');
+  const icono = document.getElementById('bloqueo-pwa-icono');
+  const titulo = document.getElementById('bloqueo-pwa-titulo');
+  const texto = document.getElementById('bloqueo-pwa-texto');
+  const alerta = document.getElementById('bloqueo-pwa-alerta');
+  if (!overlay || !icono || !titulo || !texto || !alerta) return;
+
+  alerta.className = 'bloqueo-alerta rojo';
+  if (tipo === 'mantenimiento') {
+    icono.textContent = '🛠️';
+    titulo.textContent = 'Sistema en mantenimiento';
+    texto.textContent = 'El sistema se encuentra temporalmente en mantenimiento. Por favor no utilizar hasta que sea habilitado nuevamente.';
+    alerta.textContent = '⛔ NO UTILIZAR EL SISTEMA EN ESTE MOMENTO';
+    alerta.className = 'bloqueo-alerta ambar';
+  } else if (tipo === 'alumnos_off') {
+    icono.textContent = '🎒';
+    titulo.textContent = 'Portal de alumnos deshabilitado';
+    texto.textContent = 'El acceso para estudiantes está desactivado desde el panel administrativo. Solo docentes pueden utilizar el sistema.';
+    alerta.textContent = '🚫 ACCESO DE ALUMNOS DESACTIVADO';
+  } else {
+    icono.textContent = '📴';
+    titulo.textContent = 'No se pudo verificar el sistema';
+    texto.textContent = 'No fue posible confirmar si el portal está activo. Revise la conexión a internet y vuelva a verificar.';
+    alerta.textContent = '⚠ VERIFICACIÓN PENDIENTE';
+  }
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function ocultarBloqueoPWA() {
+  const overlay = document.getElementById('pantalla-bloqueo-pwa');
+  if (overlay) overlay.style.display = 'none';
+  document.body.style.overflow = '';
+}
+function desbloqueoTemporalPWA() {
+  const pass = prompt('Código administrativo:');
+  if (pass === PASS_OVERRIDE) {
+    try { sessionStorage.setItem(PWA_UNLOCK_KEY, 'true'); } catch(_) {}
+    ocultarBloqueoPWA();
+    notif('✅ Acceso temporal concedido en esta sesión.', 'ok', 3500);
+  } else if (pass !== null) {
+    notif('❌ Código incorrecto.', 'error', 3500);
+  }
+}
+
+
+// ════════════════════════════════════════════════════════════
+// FETCH helper — fetch() primero (GAS soporta CORS), JSONP fallback
+// ════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+// CACHÉ LOCAL — respuesta instantánea desde localStorage mientras el servidor responde
+// ══════════════════════════════════════════════════════════════════════════════
+
+const GAS_CACHE_PREFIX = 'gas_cache_';
+const GAS_CACHE_TTL    = 8 * 60 * 1000; // 8 minutos en ms
+
+function gasCache_get(url) {
+  try {
+    const key  = GAS_CACHE_PREFIX + btoa(url).slice(0, 80);
+    const item = JSON.parse(localStorage.getItem(key) || 'null');
+    if (!item || Date.now() - item.ts > GAS_CACHE_TTL) return null;
+    return item.data;
+  } catch(e) { return null; }
+}
+
+function gasCache_set(url, data) {
+  try {
+    const key = GAS_CACHE_PREFIX + btoa(url).slice(0, 80);
+    localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+  } catch(e) {}
+}
+
+function gasCache_invalidate(prefix) {
+  try {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith(GAS_CACHE_PREFIX) && (!prefix || k.includes(prefix)))
+      .forEach(k => localStorage.removeItem(k));
+  } catch(e) {}
+}
+
+// fetchGAS con stale-while-revalidate:
+// 1) Devuelve caché local INMEDIATAMENTE si existe (respuesta instantánea)
+// 2) En paralelo actualiza el caché desde el servidor
+async function fetchGASCached(url, timeoutMs, forceRefresh) {
+  const cached = forceRefresh ? null : gasCache_get(url);
+  if (cached !== null) {
+    // Actualizar en background sin bloquear
+    fetchGAS(url, timeoutMs).then(fresh => {
+      if (fresh) gasCache_set(url, fresh);
+    }).catch(() => {});
+    return cached;
+  }
+  // Sin caché: esperar al servidor
+  const data = await fetchGAS(url, timeoutMs || 15000);
+  if (data) gasCache_set(url, data);
+  return data;
+}
+
+function fetchGAS(url, timeoutMs) {
+  timeoutMs = timeoutMs || 12000;
+  const cleanUrl = url.replace(/[&?]callback=[^&]*/g, '');
+
+  // Método 1: fetch normal
+  const p1 = new Promise((res, rej) => {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), timeoutMs - 2000);
+    fetch(cleanUrl, { signal: ctrl.signal, redirect: 'follow' })
+      .then(r => { clearTimeout(tid); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(res).catch(e => { clearTimeout(tid); rej(e); });
+  });
+
+  // Método 2: JSONP fallback
+  const p2 = new Promise((res, rej) => {
+    const cb = '__cb_' + Math.random().toString(36).slice(2);
+    const s  = document.createElement('script');
+    const tid = setTimeout(() => { cleanup(); rej(new Error('JSONP timeout')); }, timeoutMs);
+    function cleanup() { clearTimeout(tid); delete window[cb]; s.parentNode && s.parentNode.removeChild(s); }
+    window[cb] = d => { cleanup(); res(d); };
+    s.onerror  = () => { cleanup(); rej(new Error('JSONP error')); };
+    const sep = cleanUrl.indexOf('?') >= 0 ? '&' : '?';
+    s.src = cleanUrl + sep + 'callback=' + cb;
+    document.head.appendChild(s);
+  });
+
+  // Método 3: proxy CORS como último recurso si fetch y JSONP fallan
+  const p3 = fetch('https://corsproxy.io/?' + encodeURIComponent(cleanUrl), { cache: 'no-cache' })
+    .then(r => { if (!r.ok) throw new Error('proxy_' + r.status); return r.json(); });
+
+  return Promise.any([p1, p2, p3]).catch(() => { throw new Error('Sin conexión'); });
+}
+
+// ════════════════════════════════════════════════════════════
+// BLOQUEO POR DISPOSITIVO
+// ════════════════════════════════════════════════════════════
+function getHoyStr() {
+  // FIX: usar fecha LOCAL (no UTC) para evitar desfase en zona horaria El Salvador (UTC-6)
+  const d = new Date();
+  return d.getFullYear() + '-'
+    + String(d.getMonth() + 1).padStart(2, '0') + '-'
+    + String(d.getDate()).padStart(2, '0');
+}
+
+function dispositivoYaUsadoHoy() {
+  try {
+    const data = JSON.parse(localStorage.getItem(DEVICE_KEY) || 'null');
+    if (!data) return false;
+    return data.fecha === getHoyStr();
+  } catch(_) { return false; }
+}
+
+function marcarDispositivoUsado(nie, nombre) {
+  try {
+    localStorage.setItem(DEVICE_KEY, JSON.stringify({ fecha: getHoyStr(), nie, nombre }));
+  } catch(_) {}
+}
+
+function getDatosDispositivoHoy() {
+  try { return JSON.parse(localStorage.getItem(DEVICE_KEY) || 'null'); } catch(_) { return null; }
+}
+let expiraTimer  = null;
+let expirationDate = null;
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Fecha de hoy
+  const hoy = new Date();
+  document.getElementById('fecha-hoy').textContent = hoy.toLocaleDateString('es-ES', {
+    day:'2-digit', month:'2-digit', year:'numeric'
+  }).replace(/\//g,'/');
+  document.getElementById('tecnico-nombre').textContent = TECNICO;
+
+  // Tema guardado
+  const savedTheme = localStorage.getItem('tema_portalEstudiante') || 'dark';
+  setTheme(savedTheme);
+
+  cargarHorario();
+});
+
+// ════════════════════════════════════════════════════════════
+// TEMA
+// ════════════════════════════════════════════════════════════
+function toggleTheme() {
+  const curr = document.documentElement.getAttribute('data-theme');
+  setTheme(curr === 'dark' ? 'light' : 'dark');
+}
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('btn-theme').textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('tema_portalEstudiante', t);
+}
+
+// ════════════════════════════════════════════════════════════
+// FETCH helper — intenta fetch() primero, luego JSONP como fallback
+// GAS publica CORS headers automáticamente si está publicado como "Anyone"
+// ════════════════════════════════════════════════════════════
+function fetchJsonp(url, timeoutMs) {
+  timeoutMs = timeoutMs || 12000;
+  // Limpiar parámetro callback residual
+  const cleanUrl = url.replace(/[&?]callback=[^&]*/g, '');
+
+  // Intento 1: fetch() normal (funciona si GAS está bien publicado)
+  const fetchPromise = new Promise((resolve, reject) => {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), timeoutMs - 2000);
+    fetch(cleanUrl, { signal: ctrl.signal, redirect: 'follow' })
+      .then(r => {
+        clearTimeout(tid);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(resolve)
+      .catch(err => { clearTimeout(tid); reject(err); });
+  });
+
+  // Intento 2: JSONP clásico como fallback
+  const jsonpPromise = new Promise((resolve, reject) => {
+    const cb = '__cb_' + Math.random().toString(36).slice(2);
+    const script = document.createElement('script');
+    const tid = setTimeout(() => { cleanup(); reject(new Error('JSONP timeout')); }, timeoutMs);
+    function cleanup() {
+      clearTimeout(tid);
+      delete window[cb];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cb] = (data) => { cleanup(); resolve(data); };
+    script.onerror = () => { cleanup(); reject(new Error('JSONP error')); };
+    const sep = cleanUrl.indexOf('?') >= 0 ? '&' : '?';
+    script.src = cleanUrl + sep + 'callback=' + cb;
+    document.head.appendChild(script);
+  });
+
+  // Race: el primero que resuelva gana
+  return Promise.any([fetchPromise, jsonpPromise])
+    .catch(() => { throw new Error('Ambos métodos fallaron'); });
+}
+
+// ════════════════════════════════════════════════════════════
+// HORARIO + ESTADO DEL SISTEMA
+// ════════════════════════════════════════════════════════════
+async function cargarHorario() {
+  const chip = document.getElementById('horario-chip');
+  chip.className = 'horario-chip loading';
+  chip.textContent = '⏰ Verificando sistema...';
+
+  try {
+    const h = await fetchJsonp(SCRIPT_URL + '?tipo=horario_asistencia', 10000);
+    try { localStorage.setItem('horario_asistencia', JSON.stringify(h)); } catch(_) {}
+    if (h.mantenimiento === true) {
+        mostrarBloqueoPWA('mantenimiento');
+        return;
+      }
+      // acceso_alumnos === false ó activo === false → portal deshabilitado
+      if (h.acceso_alumnos === false || h.activo === false) {
+        mostrarBloqueoPWA('alumnos_off');
+        return;
+      }
+      ocultarBloqueoPWA();
+    actualizarChip(h);
+    return;
+  } catch(e) {
+    console.error('[INMU] Error cargando horario:', e);
+  }
+
+  // Fallback: caché local
+  try {
+    const cached = JSON.parse(localStorage.getItem('horario_asistencia') || '{}');
+    if (cached.inicio) {
+      actualizarChip(cached);
+      notif('📴 Sin conexión — usando horario guardado.', 'info', 4000);
+      return;
+    }
+  } catch(_) {}
+
+  chip.className = 'horario-chip inactive';
+  chip.textContent = '⚠ No se pudo verificar el horario';
+  mostrarBloqueoPWA('offline');
+}
+
+function mostrarBannerSistema(tipo, msg) {
+  const banner = document.getElementById('sistema-banner');
+  const cardV  = document.getElementById('card-verificar');
+  if (banner) {
+    banner.style.display = 'flex';
+    banner.style.cssText += tipo === 'mantenimiento'
+      ? ';background:rgba(245,158,11,.15);border:1.5px solid rgba(245,158,11,.4);color:#b45309;'
+      : ';background:rgba(239,68,68,.1);border:1.5px solid rgba(239,68,68,.3);color:#dc2626;';
+    banner.innerHTML = '<span style="font-size:28px;flex-shrink:0">'
+      + (tipo==='mantenimiento'?'🔧':'🔒')
+      + '</span><div><strong style="display:block;font-size:15px;margin-bottom:3px">'
+      + (tipo==='mantenimiento'?'Sistema en Mantenimiento':'Portal Desactivado')
+      + '</strong>' + msg + '</div>';
+  }
+  if (cardV) cardV.style.display = 'none';
+}
+function actualizarChip(h) {
+  const chip   = document.getElementById('horario-chip');
+  const dentro = dentroDelHorario(h);
+  chip.className = 'horario-chip ' + (dentro ? 'active' : 'inactive');
+  chip.innerHTML = dentro
+    ? `✅ <strong>Sistema Activo</strong> &mdash; Horario: ${h.inicio} &ndash; ${h.fin}`
+    : `🔴 Fuera del horario de marcado: <strong>${h.inicio} &ndash; ${h.fin}</strong>`;
+}
+function getHorario() {
+  try {
+    const h = JSON.parse(localStorage.getItem('horario_asistencia') || '{}');
+    return { inicio: h.inicio || '06:30', fin: h.fin || '08:10' };
+  } catch(e) { return { inicio: '06:30', fin: '08:10' }; }
+}
+function dentroDelHorario(h) {
+  h = h || getHorario();
+  const [hi, hm] = (h.inicio||'06:30').split(':').map(Number);
+  const [fi, fm] = (h.fin   ||'08:10').split(':').map(Number);
+  const now = new Date();
+  const m   = now.getHours() * 60 + now.getMinutes();
+  return m >= hi*60+hm && m <= fi*60+fm;
+}
+
+// ════════════════════════════════════════════════════════════
+// TIPO DOC
+// ════════════════════════════════════════════════════════════
+function onTipoChange() {
+  const tipo = document.getElementById('tipo-doc').value;
+  const lbl  = document.getElementById('lbl-campo');
+  const inp  = document.getElementById('input-doc');
+  const labels = { nie: 'NIE', dui: 'DUI', nombre: 'Nombre completo' };
+  const placeholders = { nie: 'Ej: 19910934', dui: 'Ej: 04567890-8', nombre: 'Apellido, Nombre' };
+  const modes = { nie: 'numeric', dui: 'text', nombre: 'text' };
+  lbl.textContent = labels[tipo] || 'NIE';
+  inp.placeholder = placeholders[tipo] || '';
+  inp.inputMode   = modes[tipo] || 'text';
+  resetResult();
+}
+
+// ════════════════════════════════════════════════════════════
+// VERIFICAR ALUMNO
+// ════════════════════════════════════════════════════════════
+async function verificarAlumno() {
+  const query = (document.getElementById('input-doc').value || '').trim();
+  if (!query) { notif('Ingresa tu NIE o datos.', 'error'); return; }
+
+  // ── Bloqueo por dispositivo ──────────────────────────────
+  if (dispositivoYaUsadoHoy()) {
+    const datos = getDatosDispositivoHoy();
+    const msg = datos
+      ? `Este dispositivo ya registró asistencia hoy (${datos.nombre || datos.nie}).`
+      : 'Este dispositivo ya fue usado para marcar asistencia hoy.';
+    mostrarModalDispositivo(msg, query);
+    return;
+  }
+
+  await _ejecutarVerificacion(query);
+}
+
+function mostrarModalDispositivo(msg, query) {
+  // Crear modal inline
+  let overlay = document.getElementById('modal-dispositivo');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'modal-dispositivo';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = `
+    <div style="background:var(--card-bg,#1a1f2e);border:1.5px solid var(--card-border,rgba(255,255,255,0.1));border-radius:20px;padding:28px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+      <div style="font-size:40px;margin-bottom:12px;">⚠️</div>
+      <div style="font-size:15px;font-weight:700;color:var(--warning-text,#fbbf24);margin-bottom:8px;">Dispositivo ya utilizado</div>
+      <div style="font-size:13px;color:var(--text-secondary,#8b949e);margin-bottom:20px;line-height:1.5;">${msg}<br><br>Si deseas enviar asistencia por un compañero, ingresa la contraseña de acceso.</div>
+      <input id="modal-pass-input" type="password" placeholder="Contraseña de acceso" autocomplete="off"
+        style="width:100%;padding:12px 14px;border:1.5px solid var(--input-border,rgba(255,255,255,0.12));border-radius:12px;background:var(--input-bg,#0d1117);color:var(--text-primary,#e6edf3);font-size:15px;outline:none;margin-bottom:12px;font-family:inherit;"
+        onkeydown="if(event.key==='Enter') _modalDispositivoConfirmar('${query.replace(/'/g,"\\'")}')">
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button onclick="_cerrarModalDispositivo()" style="flex:1;padding:12px;border:1.5px solid var(--card-border,rgba(255,255,255,0.1));border-radius:12px;background:transparent;color:var(--text-secondary,#8b949e);font-weight:700;cursor:pointer;font-size:14px;font-family:inherit;">Cancelar</button>
+        <button onclick="_modalDispositivoConfirmar('${query.replace(/'/g,"\\'")}') " style="flex:1;padding:12px;border:none;border-radius:12px;background:var(--accent,#4f8ef7);color:white;font-weight:700;cursor:pointer;font-size:14px;font-family:inherit;">Continuar</button>
+      </div>
+    </div>`;
+  overlay.style.display = 'flex';
+  setTimeout(() => { const i = document.getElementById('modal-pass-input'); if(i) i.focus(); }, 100);
+}
+
+function _cerrarModalDispositivo() {
+  const m = document.getElementById('modal-dispositivo');
+  if (m) m.style.display = 'none';
+}
+
+async function _modalDispositivoConfirmar(query) {
+  const pass = (document.getElementById('modal-pass-input') || {}).value || '';
+  if (pass !== PASS_OVERRIDE) {
+    notif('❌ Contraseña incorrecta.', 'error', 3000);
+    return;
+  }
+  _cerrarModalDispositivo();
+  // Marcar como override: resetear bloqueo para esta sesión
+  try { localStorage.removeItem(DEVICE_KEY); } catch(_) {}
+  await _ejecutarVerificacion(query);
+}
+
+async function _ejecutarVerificacion(query) {
+  const tipo = document.getElementById('tipo-doc').value;
+  const btn  = document.getElementById('btn-verificar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+
+  resetResult();
+
+  try {
+    let url;
+    if (tipo === 'nie' || tipo === 'dui') {
+      url = `${SCRIPT_URL}?tipo=validar_alumno_nie&nie=${encodeURIComponent(query)}`;
+    } else {
+      url = `${SCRIPT_URL}?tipo=buscar_alumno&query=${encodeURIComponent(query)}`;
+    }
+
+    const data = await fetchGASCached(url, 12000);
+
+    if (!data || data.error || (!data.nombre && !data.nie)) {
+      mostrarError('No se encontró ningún alumno con esos datos.');
+      btn.disabled = false; btn.textContent = 'Verificar';
+      return;
+    }
+
+    const alumno = Array.isArray(data) ? data[0] : data;
+    if (!alumno || !alumno.nombre) {
+      mostrarError('No se encontró ningún alumno con esos datos.');
+      btn.disabled = false; btn.textContent = 'Verificar';
+      return;
+    }
+
+    alumnoActual = alumno;
+
+    // Guardar en caché local
+    try {
+      const cache = JSON.parse(localStorage.getItem('cache_alumnos') || '[]');
+      const idx   = cache.findIndex(a => a.nie == alumno.nie);
+      if (idx >= 0) cache[idx] = alumno; else cache.push(alumno);
+      localStorage.setItem('cache_alumnos', JSON.stringify(cache.slice(-200)));
+    } catch(_) {}
+
+    if (alumno.marcado_hoy) {
+      mostrarYaMarcado(alumno);
+    } else {
+      mostrarResultadoOK(alumno);
+      habilitarValidacion();
+    }
+
+  } catch(e) {
+    const found = buscarEnLocal(query, tipo);
+    if (found) {
+      alumnoActual = found;
+      mostrarResultadoOK(found);
+      habilitarValidacion();
+      notif('⚠ Modo sin conexión — datos del caché.', 'info', 4000);
+    } else {
+      mostrarError('⚠ Sin conexión. No se encontró el alumno localmente.');
+    }
+  }
+
+  btn.disabled = false; btn.textContent = 'Verificar';
+}
+
+function buscarEnLocal(q, tipo) {
+  try {
+    const lista = JSON.parse(localStorage.getItem('cache_alumnos') || '[]');
+    const norm  = s => (s||'').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const qn    = norm(q);
+    if (tipo === 'nombre') {
+      return lista.find(a => norm(a.nombre).includes(qn)) || null;
+    }
+    return lista.find(a => norm(String(a.nie)) === qn) || null;
+  } catch(e) { return null; }
+}
+
+function mostrarResultadoOK(alumno) {
+  const box = document.getElementById('result-box');
+  document.getElementById('result-nombre').textContent = alumno.nombre || '—';
+  document.getElementById('result-sub').textContent =
+    `Ya te has identificado correctamente. Ahora puedes validar tu asistencia.`;
+  box.className = 'result-box success';
+  box.style.display = 'flex';
+}
+
+function mostrarError(msg) {
+  const box = document.getElementById('result-error');
+  document.getElementById('result-error-text').textContent = msg;
+  box.style.display = 'block';
+  document.getElementById('btn-validar').disabled = true;
+}
+
+function mostrarYaMarcado(alumno) {
+  const box = document.getElementById('ya-marcado-box');
+  document.getElementById('ym-title').textContent = `${alumno.nombre} — Ya marcaste hoy`;
+  document.getElementById('ym-sub').textContent   = 'Tu asistencia ya fue registrada para hoy.';
+  box.style.display = 'block';
+  document.getElementById('btn-validar').disabled = true;
+  // Mostrar igual el nombre
+  mostrarResultadoOK(alumno);
+}
+
+function resetResult() {
+  alumnoActual = null;
+  document.getElementById('result-box').className   = 'result-box';
+  document.getElementById('result-box').style.display = 'none';
+  document.getElementById('result-error').style.display  = 'none';
+  document.getElementById('ya-marcado-box').style.display = 'none';
+  document.getElementById('btn-validar').disabled = true;
+  document.getElementById('expira-text').style.display = 'none';
+  if (expiraTimer) { clearInterval(expiraTimer); expiraTimer = null; }
+}
+
+function resetForm() {
+  document.getElementById('input-doc').value = '';
+  resetResult();
+}
+
+// ════════════════════════════════════════════════════════════
+// HABILITAR VALIDACIÓN + TEMPORIZADOR
+// ════════════════════════════════════════════════════════════
+function habilitarValidacion() {
+  const btn = document.getElementById('btn-validar');
+  const h   = getHorario();
+  const dentro = dentroDelHorario();
+
+  btn.disabled = !dentro;
+
+  // Calcular expiración: fin del horario de hoy
+  const ahora = new Date();
+  const [fi, fm] = (h.fin||'08:10').split(':').map(Number);
+  const exp = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), fi, fm, 0);
+  expirationDate = exp;
+
+  const expEl = document.getElementById('expira-text');
+  const expVal = document.getElementById('expira-val');
+  expEl.style.display = 'flex';
+  expVal.textContent = exp.toLocaleDateString('es-ES', {day:'2-digit',month:'2-digit',year:'numeric'})
+    + ' ' + exp.toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit'});
+
+  if (expiraTimer) clearInterval(expiraTimer);
+  if (dentro) {
+    // Countdown
+    expiraTimer = setInterval(() => {
+      const secsLeft = Math.floor((expirationDate - new Date()) / 1000);
+      if (secsLeft <= 0) {
+        clearInterval(expiraTimer);
+        btn.disabled = true;
+        notif('⏰ El horario de marcado ha expirado.', 'info', 5000);
+      }
+    }, 30000);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// VALIDAR ASISTENCIA
+// ════════════════════════════════════════════════════════════
+async function validarAsistencia() {
+  if (!alumnoActual) { notif('Primero verifica tu identidad.', 'error'); return; }
+
+  if (!dentroDelHorario()) {
+    const h = getHorario();
+    notif(`⏰ Fuera del horario (${h.inicio}–${h.fin}).`, 'error', 4000);
+    return;
+  }
+
+  const btn = document.getElementById('btn-validar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Registrando...';
+
+  const ahora   = new Date();
+  const fechaStr = ahora.toLocaleDateString('es-ES');
+  const horaStr  = ahora.toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit'});
+
+  const payload = {
+    tipo_post: 'asistencia_alumno',
+    nie:     alumnoActual.nie,
+    nombre:  alumnoActual.nombre,
+    grado:   alumnoActual.grado,
+    seccion: alumnoActual.seccion,
+    sexo:    alumnoActual.sexo,
+    estado:  'presente',
+    fecha:   fechaStr,
+    hora:    horaStr
+  };
+
+  // FIX: JSONP GET en lugar de POST (POST se pierde en redirect 302 de Google)
+  const urlMarcar = SCRIPT_URL
+    + '?tipo=marcar_alumno'
+    + '&nie='          + encodeURIComponent(alumnoActual.nie     || '')
+    + '&estado=presente'
+    + '&justificante=' + encodeURIComponent(payload.justificante || '');
+
+  try {
+    const resp = await fetchGAS(urlMarcar, 15000);
+    const key  = `asist_${alumnoActual.nie}_${fechaStr.replace(/\\//g,'_')}`;
+    try { localStorage.setItem(key, JSON.stringify(payload)); } catch(_) {}
+    marcarDispositivoUsado(alumnoActual.nie, alumnoActual.nombre);
+    gasCache_invalidate(); // limpiar caché para que la próxima verificación sea fresca
+    mostrarExito(alumnoActual, (resp && resp.hora) || horaStr);
+  } catch(e) {
+    const key = `asist_offline_${alumnoActual.nie}_${Date.now()}`;
+    try { localStorage.setItem(key, JSON.stringify(payload)); } catch(_) {}
+    marcarDispositivoUsado(alumnoActual.nie, alumnoActual.nombre);
+    notif('⚠️ Sin conexión. Asistencia guardada localmente.', 'info', 5000);
+    mostrarExito(alumnoActual, horaStr);
+  }
+}
+
+function mostrarExito(alumno, hora) {
+  document.getElementById('exito-nombre').textContent = alumno.nombre || '—';
+  document.getElementById('exito-info').textContent =
+    `${alumno.grado || '—'} · Sección ${alumno.seccion || '—'}`;
+  document.getElementById('exito-hora').textContent = `Hora: ${hora}`;
+  irA('v-exito');
+}
+
+// ════════════════════════════════════════════════════════════
+// VOLVER AL INICIO — restaura el botón "Valida tu Asistencia"
+// ════════════════════════════════════════════════════════════
+function volverAlInicio() {
+  irA('v-login');
+  resetForm();
+  // Asegurar que el botón validar quede en su estado normal (no "Registrando...")
+  const btn = document.getElementById('btn-validar');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Valida tu Asistencia';
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// NAVEGACIÓN / UTILS
+// ════════════════════════════════════════════════════════════
+function irA(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById(viewId);
+  if (el) el.classList.add('active');
+}
+
+function notif(msg, tipo='ok', ms=3200) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className   = 'notif-' + tipo;
+  el.style.display = 'block';
+  clearTimeout(notif._t);
+  notif._t = setTimeout(() => { el.style.display = 'none'; }, ms);
+}
+
+function fetchConTimeout(url, ms=8000) {
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { signal: ctrl.signal })
+    .finally(() => clearTimeout(tid));
+}
+
+
+// ════════════════════════════════════════════════════════════
+// PWA: registrar Service Worker si el archivo sw.js está disponible
+// ════════════════════════════════════════════════════════════
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js').catch(function(err) {
+      console.warn('[INMU] Service Worker no registrado:', err);
+    });
+  });
+}
+
+</script>
+</body>
+</html>
