@@ -459,8 +459,10 @@
     border-top-color: rgba(255,255,255,0.06);
   }
   [data-theme="light"] #footer-alumno {
-    background: #0c447c;
-    border-top-color: rgba(255,255,255,0.15);
+    --footer-bg: #0c447c;
+    --footer-border: rgba(255,255,255,0.15);
+    background: #0c447c !important;
+    border-top-color: rgba(255,255,255,0.15) !important;
   }
   [data-theme="light"] #footer-alumno a { color: #86efac !important; }
   [data-theme="light"] .footer-ver,
@@ -471,6 +473,10 @@
   [data-theme="dark"] footer img[src*="logo2"] {
     filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(255,255,255,0.2));
     opacity: 0.9;
+  }
+  [data-theme="light"] img[src*="logo2.svg"] {
+    filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(0,0,0,0.18));
+    opacity: 0.95;
   }
   [data-theme="light"] img[src*=".svg"],
   [data-theme="light"] img[src*="svg"] {
@@ -723,8 +729,8 @@
 <!-- FOOTER -->
 <footer id="footer-alumno" style="
   width:100%;
-  background: var(--card-bg, #1e293b);
-  border-top: 3px solid rgba(255,255,255,0.08);
+  background: var(--footer-bg, var(--card-bg, #1e293b));
+  border-top: 3px solid var(--footer-border, rgba(255,255,255,0.08));
   padding: 20px 16px 28px;
   margin-top: auto;
   display: flex;
@@ -738,7 +744,7 @@
   <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:10px 28px;max-width:600px;width:100%;text-align:center;">
     <div>
       <div style="font-size:10px;opacity:.55;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);">Sistema INMU</div>
-      <div id="footer-ver-alumno" style="font-size:15px;font-weight:800;color:var(--text-primary);letter-spacing:.3px;">v1.90</div>
+      <div id="footer-ver-alumno" style="font-size:15px;font-weight:800;color:var(--text-primary);letter-spacing:.3px;">v1.91</div>
     </div>
     <div style="border-left:1px solid rgba(255,255,255,0.1);padding-left:22px;">
       <div style="font-size:10px;opacity:.55;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);">Soporte &amp; Errores</div>
