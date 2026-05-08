@@ -135,6 +135,39 @@
   }
   .btn-theme:hover { opacity: .8; }
 
+  /* ── BARRA DOCENTE (solo visible cuando usó el código administrativo) ── */
+  #barra-docente {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .btn-docente {
+    border: none;
+    border-radius: 9px;
+    padding: 7px 11px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--trans);
+    line-height: 1.2;
+  }
+  .btn-docente:active { transform: scale(.97); }
+  .btn-docente.salir {
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+    border: 1.5px solid rgba(239,68,68,0.35);
+  }
+  .btn-docente.salir:hover { background: rgba(239,68,68,0.25); }
+  .btn-docente.enviar {
+    background: linear-gradient(135deg,#16a34a,#15803d);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(22,163,74,0.35);
+  }
+  .btn-docente.enviar:hover { opacity: .88; }
+
   /* ── BODY WRAPPER ── */
   .page-body {
     width: 100%; max-width: 440px;
@@ -601,6 +634,17 @@
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+    <!-- Barra docente: solo visible tras ingresar código administrativo con portal bloqueado -->
+    <div id="barra-docente">
+      <button type="button" class="btn-docente enviar" onclick="docenteEnviarAsistencia()"
+        title="Permite marcar asistencia aunque el portal esté desactivado para alumnos">
+        📤 Enviar Asistencia Bloqueada
+      </button>
+      <button type="button" class="btn-docente salir" onclick="docenteSalir()"
+        title="Cerrar acceso docente y volver a la pantalla de bloqueo">
+        🚪 Salir
+      </button>
+    </div>
     <img src="Escudo_de_El_Salvador.svg"
          alt="Escudo El Salvador"
          onerror="this.style.display='none'"
@@ -718,7 +762,7 @@
         <div style="font-size:13px;color:var(--success-text);font-weight:600;">Asistencia registrada con éxito</div>
         <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" id="exito-hora">—</div>
       </div>
-      <button class="btn-validar" onclick="volverAlInicio();" style="background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 20px rgba(79,142,247,0.35);">
+      <button id="btn-volver-exito" class="btn-validar" onclick="volverAlInicio();" style="background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 20px rgba(79,142,247,0.35);">
         ← Volver al inicio
       </button>
     </div>
@@ -750,54 +794,103 @@ const DEVICE_KEY = 'inmu_device_used_today'; // localStorage key para bloqueo po
 // BLOQUEO FULLSCREEN PWA — mantenimiento / alumnos desactivado
 // Desbloqueo temporal: solo dura esta pestaña/sesión.
 // ════════════════════════════════════════════════════════════
-const PWA_UNLOCK_KEY = 'inmu_pwa_unlock_temporal';
+const PWA_UNLOCK_KEY    = 'inmu_pwa_unlock_temporal';
+const MODO_BLOQUEO_KEY  = 'inmu_modo_bloqueo'; // 'alumnos_off' | 'mantenimiento' | 'offline' | ''
+
 function pwaEstaDesbloqueadoTemporalmente() {
   try { return sessionStorage.getItem(PWA_UNLOCK_KEY) === 'true'; } catch(_) { return false; }
 }
+
 function mostrarBloqueoPWA(tipo) {
   if (pwaEstaDesbloqueadoTemporalmente()) return;
+  // Guardar tipo de bloqueo activo para usarlo al volver
+  try { sessionStorage.setItem(MODO_BLOQUEO_KEY, tipo); } catch(_) {}
+
   const overlay = document.getElementById('pantalla-bloqueo-pwa');
-  const icono = document.getElementById('bloqueo-pwa-icono');
-  const titulo = document.getElementById('bloqueo-pwa-titulo');
-  const texto = document.getElementById('bloqueo-pwa-texto');
-  const alerta = document.getElementById('bloqueo-pwa-alerta');
+  const icono   = document.getElementById('bloqueo-pwa-icono');
+  const titulo  = document.getElementById('bloqueo-pwa-titulo');
+  const texto   = document.getElementById('bloqueo-pwa-texto');
+  const alerta  = document.getElementById('bloqueo-pwa-alerta');
   if (!overlay || !icono || !titulo || !texto || !alerta) return;
 
   alerta.className = 'bloqueo-alerta rojo';
   if (tipo === 'mantenimiento') {
-    icono.textContent = '🛠️';
+    icono.textContent  = '🛠️';
     titulo.textContent = 'Sistema en mantenimiento';
-    texto.textContent = 'El sistema se encuentra temporalmente en mantenimiento. Por favor no utilizar hasta que sea habilitado nuevamente.';
+    texto.textContent  = 'El sistema se encuentra temporalmente en mantenimiento. Por favor no utilizar hasta que sea habilitado nuevamente.';
     alerta.textContent = '⛔ NO UTILIZAR EL SISTEMA EN ESTE MOMENTO';
-    alerta.className = 'bloqueo-alerta ambar';
+    alerta.className   = 'bloqueo-alerta ambar';
   } else if (tipo === 'alumnos_off') {
-    icono.textContent = '🎒';
+    icono.textContent  = '🎒';
     titulo.textContent = 'Portal de alumnos deshabilitado';
-    texto.textContent = 'El acceso para estudiantes está desactivado desde el panel administrativo. Solo docentes pueden utilizar el sistema.';
+    texto.textContent  = 'El acceso para estudiantes está desactivado desde el panel administrativo. Solo docentes pueden utilizar el sistema.';
     alerta.textContent = '🚫 ACCESO DE ALUMNOS DESACTIVADO';
   } else {
-    icono.textContent = '📴';
+    icono.textContent  = '📴';
     titulo.textContent = 'No se pudo verificar el sistema';
-    texto.textContent = 'No fue posible confirmar si el portal está activo. Revise la conexión a internet y vuelva a verificar.';
+    texto.textContent  = 'No fue posible confirmar si el portal está activo. Revise la conexión a internet y vuelva a verificar.';
     alerta.textContent = '⚠ VERIFICACIÓN PENDIENTE';
   }
   overlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+
+  // Ocultar barra docente si se vuelve a mostrar el bloqueo
+  _ocultarBarraDocente();
 }
+
 function ocultarBloqueoPWA() {
   const overlay = document.getElementById('pantalla-bloqueo-pwa');
   if (overlay) overlay.style.display = 'none';
   document.body.style.overflow = '';
 }
+
+// ── Código administrativo ─────────────────────────────────────────────
 function desbloqueoTemporalPWA() {
   const pass = prompt('Código administrativo:');
-  if (pass === PASS_OVERRIDE) {
-    try { sessionStorage.setItem(PWA_UNLOCK_KEY, 'true'); } catch(_) {}
-    ocultarBloqueoPWA();
-    notif('✅ Acceso temporal concedido en esta sesión.', 'ok', 3500);
-  } else if (pass !== null) {
+  if (pass === null) return; // canceló
+  if (pass !== PASS_OVERRIDE) {
     notif('❌ Código incorrecto.', 'error', 3500);
+    return;
   }
+  // Marcar sesión como desbloqueada para docente
+  try { sessionStorage.setItem(PWA_UNLOCK_KEY, 'true'); } catch(_) {}
+  ocultarBloqueoPWA();
+  _mostrarBarraDocente();
+  notif('✅ Acceso docente concedido. Solo en este dispositivo.', 'ok', 4000);
+}
+
+// ── Barra docente (visible solo tras código administrativo con portal bloqueado) ──
+function _mostrarBarraDocente() {
+  const barra = document.getElementById('barra-docente');
+  if (barra) barra.style.display = 'flex';
+}
+function _ocultarBarraDocente() {
+  const barra = document.getElementById('barra-docente');
+  if (barra) barra.style.display = 'none';
+}
+
+// Botón "Salir": limpia la sesión docente y vuelve a mostrar el bloqueo
+function docenteSalir() {
+  try { sessionStorage.removeItem(PWA_UNLOCK_KEY); } catch(_) {}
+  _ocultarBarraDocente();
+  // Recuperar el tipo de bloqueo que estaba activo
+  let tipo = 'alumnos_off';
+  try { tipo = sessionStorage.getItem(MODO_BLOQUEO_KEY) || 'alumnos_off'; } catch(_) {}
+  // Forzar mostrar bloqueo (pwaEstaDesbloqueadoTemporalmente() ya es false)
+  mostrarBloqueoPWA(tipo);
+  // Limpiar el form por si quedó algo
+  resetForm && resetForm();
+}
+
+// Botón "Enviar Asistencia Bloqueada": lleva al formulario como modo docente especial
+// Al terminar (éxito), vuelve a mostrar el bloqueo en lugar del inicio normal
+function docenteEnviarAsistencia() {
+  // Scroll al inicio y asegurar vista login visible
+  irA('v-login');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  notif('👨‍🏫 Modo docente: marca asistencia y el sistema seguirá bloqueado para los demás.', 'ok', 5000);
+  // Marcar que al finalizar la asistencia debe volver al bloqueo
+  try { sessionStorage.setItem('inmu_docente_modo_bloqueo', 'true'); } catch(_) {}
 }
 
 
@@ -931,6 +1024,11 @@ window.addEventListener('DOMContentLoaded', () => {
   // Tema guardado
   const savedTheme = localStorage.getItem('tema_portalEstudiante') || 'dark';
   setTheme(savedTheme);
+
+  // Si la sesión docente sigue activa (misma pestaña), mostrar barra
+  if (pwaEstaDesbloqueadoTemporalmente()) {
+    _mostrarBarraDocente();
+  }
 
   cargarHorario();
 });
@@ -1277,8 +1375,10 @@ function habilitarValidacion() {
   const btn = document.getElementById('btn-validar');
   const h   = getHorario();
   const dentro = dentroDelHorario();
+  // En modo docente-bloqueado: habilitar siempre sin importar horario
+  const modoDocente = _esModoDocenteBloqueado();
 
-  btn.disabled = !dentro;
+  btn.disabled = !dentro && !modoDocente;
 
   // Calcular expiración: fin del horario de hoy
   const ahora = new Date();
@@ -1293,8 +1393,8 @@ function habilitarValidacion() {
     + ' ' + exp.toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit'});
 
   if (expiraTimer) clearInterval(expiraTimer);
-  if (dentro) {
-    // Countdown
+  if (dentro && !modoDocente) {
+    // Countdown (solo en modo normal)
     expiraTimer = setInterval(() => {
       const secsLeft = Math.floor((expirationDate - new Date()) / 1000);
       if (secsLeft <= 0) {
@@ -1312,7 +1412,8 @@ function habilitarValidacion() {
 async function validarAsistencia() {
   if (!alumnoActual) { notif('Primero verifica tu identidad.', 'error'); return; }
 
-  if (!dentroDelHorario()) {
+  // En modo docente-bloqueado, omitir restricción de horario
+  if (!_esModoDocenteBloqueado() && !dentroDelHorario()) {
     const h = getHorario();
     notif(`⏰ Fuera del horario (${h.inicio}–${h.fin}).`, 'error', 4000);
     return;
@@ -1366,13 +1467,41 @@ function mostrarExito(alumno, hora) {
   document.getElementById('exito-info').textContent =
     `${alumno.grado || '—'} · Sección ${alumno.seccion || '—'}`;
   document.getElementById('exito-hora').textContent = `Hora: ${hora}`;
+
+  // Si el docente envió asistencia mientras el sistema estaba bloqueado,
+  // mostrar botón "Volver al bloqueo" en lugar del botón normal
+  const btnVolver = document.getElementById('btn-volver-exito');
+  const enModoDocente = _esModoDocenteBloqueado();
+  if (btnVolver) {
+    if (enModoDocente) {
+      btnVolver.textContent = '🔒 Volver al sistema bloqueado';
+      btnVolver.style.background = 'linear-gradient(135deg,#dc2626,#b91c1c)';
+    } else {
+      btnVolver.textContent = '← Volver al inicio';
+      btnVolver.style.background = '';
+    }
+  }
   irA('v-exito');
+}
+
+function _esModoDocenteBloqueado() {
+  try { return sessionStorage.getItem('inmu_docente_modo_bloqueo') === 'true'; } catch(_) { return false; }
 }
 
 // ════════════════════════════════════════════════════════════
 // VOLVER AL INICIO — restaura el botón "Valida tu Asistencia"
 // ════════════════════════════════════════════════════════════
 function volverAlInicio() {
+  // Si estaba en modo docente-bloqueado → volver al bloqueo, no al inicio
+  if (_esModoDocenteBloqueado()) {
+    try { sessionStorage.removeItem('inmu_docente_modo_bloqueo'); } catch(_) {}
+    resetForm();
+    const btn = document.getElementById('btn-validar');
+    if (btn) { btn.disabled = true; btn.textContent = 'Valida tu Asistencia'; }
+    // Volver al bloqueo
+    docenteSalir();
+    return;
+  }
   irA('v-login');
   resetForm();
   // Asegurar que el botón validar quede en su estado normal (no "Registrando...")
