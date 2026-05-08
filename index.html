@@ -1,11 +1,17 @@
+
 <!DOCTYPE html>
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d1117">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PERMANENCIA — Portal del Estudiante</title>
 <link rel="icon" type="image/jpeg" href="logo3.jpg">
 <link rel="apple-touch-icon" href="logo3.jpg">
+<link rel="manifest" href="manifest.webmanifest">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -429,9 +435,157 @@
   [data-theme="light"] img[src*="svg"] {
     filter: none;
   }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PANTALLA COMPLETA DE BLOQUEO — PWA / MANTENIMIENTO / ALUMNOS OFF
+   No altera el diseño original: solo se muestra cuando el backend lo indica.
+═══════════════════════════════════════════════════════════════ */
+#pantalla-bloqueo-pwa {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background:
+    radial-gradient(circle at top, rgba(79,142,247,0.16), transparent 34%),
+    linear-gradient(135deg, #020617 0%, #0d1117 46%, #111827 100%);
+  color: #f8fafc;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 28px 18px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#pantalla-bloqueo-pwa .bloqueo-card {
+  width: min(440px, 100%);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.76);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 30px 24px;
+  position: relative;
+  overflow: hidden;
+}
+#pantalla-bloqueo-pwa .bloqueo-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('marca de agua.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 75%;
+  opacity: .08;
+  filter: brightness(0) invert(1);
+  pointer-events: none;
+}
+#pantalla-bloqueo-pwa .bloqueo-content { position: relative; z-index: 1; }
+#pantalla-bloqueo-pwa .bloqueo-logo {
+  width: 118px;
+  height: 118px;
+  object-fit: contain;
+  margin: 0 auto 14px;
+  display: block;
+  filter: brightness(0) invert(1) drop-shadow(0 4px 14px rgba(255,255,255,.16));
+}
+#pantalla-bloqueo-pwa .bloqueo-icono {
+  font-size: 58px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+#pantalla-bloqueo-pwa .bloqueo-titulo {
+  font-size: 27px;
+  line-height: 1.08;
+  font-weight: 900;
+  letter-spacing: -.03em;
+  margin: 8px 0 10px;
+  text-transform: uppercase;
+}
+#pantalla-bloqueo-pwa .bloqueo-texto {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #cbd5e1;
+  margin: 0 0 18px;
+}
+#pantalla-bloqueo-pwa .bloqueo-alerta {
+  border-radius: 15px;
+  padding: 14px 15px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+  margin: 16px 0 16px;
+}
+#pantalla-bloqueo-pwa .bloqueo-alerta.rojo {
+  background: rgba(239,68,68,.15);
+  border: 1.5px solid rgba(239,68,68,.45);
+  color: #fecaca;
+}
+#pantalla-bloqueo-pwa .bloqueo-alerta.ambar {
+  background: rgba(245,158,11,.16);
+  border: 1.5px solid rgba(245,158,11,.48);
+  color: #fde68a;
+}
+#pantalla-bloqueo-pwa .bloqueo-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+#pantalla-bloqueo-pwa .bloqueo-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 13px 16px;
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .12s ease, opacity .2s ease;
+}
+#pantalla-bloqueo-pwa .bloqueo-btn:active { transform: scale(.98); }
+#pantalla-bloqueo-pwa .bloqueo-btn.admin {
+  background: linear-gradient(135deg, #4f8ef7, #3b7de8);
+  color: white;
+}
+#pantalla-bloqueo-pwa .bloqueo-btn.reload {
+  background: rgba(255,255,255,.08);
+  color: #cbd5e1;
+  border: 1px solid rgba(255,255,255,.12);
+}
+#pantalla-bloqueo-pwa .bloqueo-footer {
+  margin-top: 18px;
+  font-size: 10.5px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+@media (display-mode: standalone) {
+  #pantalla-bloqueo-pwa { padding-top: max(28px, env(safe-area-inset-top)); }
+}
+
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     OVERLAY FULLSCREEN: Bloqueo PWA / mantenimiento / portal alumnos off
+═══════════════════════════════════════════════════════════════ -->
+<div id="pantalla-bloqueo-pwa" role="dialog" aria-modal="true" aria-labelledby="bloqueo-pwa-titulo">
+  <div class="bloqueo-card">
+    <div class="bloqueo-content">
+      <img src="logo2.svg" alt="Logo institucional" class="bloqueo-logo" onerror="this.style.display='none'">
+      <div class="bloqueo-icono" id="bloqueo-pwa-icono">🔒</div>
+      <div class="bloqueo-titulo" id="bloqueo-pwa-titulo">Sistema bloqueado</div>
+      <p class="bloqueo-texto" id="bloqueo-pwa-texto">Verificando estado del sistema...</p>
+      <div class="bloqueo-alerta rojo" id="bloqueo-pwa-alerta">Acceso restringido</div>
+      <div class="bloqueo-botones">
+        <button type="button" class="bloqueo-btn admin" onclick="desbloqueoTemporalPWA()">🔑 Código administrativo</button>
+        <button type="button" class="bloqueo-btn reload" onclick="location.reload()">🔄 Volver a verificar</button>
+      </div>
+      <div class="bloqueo-footer">Instituto Nacional de Mercedes Umaña · Sistema de Permanencia</div>
+    </div>
+  </div>
+</div>
+
 
 <div id="notif"></div>
 
@@ -592,6 +746,61 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKnxasl94QOwaLx2QZM
 const PASS_OVERRIDE = "747-8"; // Contraseña para permitir marcado desde dispositivo ya usado
 const TECNICO = "";
 const DEVICE_KEY = 'inmu_device_used_today'; // localStorage key para bloqueo por dispositivo
+
+// ════════════════════════════════════════════════════════════
+// BLOQUEO FULLSCREEN PWA — mantenimiento / alumnos desactivado
+// Desbloqueo temporal: solo dura esta pestaña/sesión.
+// ════════════════════════════════════════════════════════════
+const PWA_UNLOCK_KEY = 'inmu_pwa_unlock_temporal';
+function pwaEstaDesbloqueadoTemporalmente() {
+  try { return sessionStorage.getItem(PWA_UNLOCK_KEY) === 'true'; } catch(_) { return false; }
+}
+function mostrarBloqueoPWA(tipo) {
+  if (pwaEstaDesbloqueadoTemporalmente()) return;
+  const overlay = document.getElementById('pantalla-bloqueo-pwa');
+  const icono = document.getElementById('bloqueo-pwa-icono');
+  const titulo = document.getElementById('bloqueo-pwa-titulo');
+  const texto = document.getElementById('bloqueo-pwa-texto');
+  const alerta = document.getElementById('bloqueo-pwa-alerta');
+  if (!overlay || !icono || !titulo || !texto || !alerta) return;
+
+  alerta.className = 'bloqueo-alerta rojo';
+  if (tipo === 'mantenimiento') {
+    icono.textContent = '🛠️';
+    titulo.textContent = 'Sistema en mantenimiento';
+    texto.textContent = 'El sistema se encuentra temporalmente en mantenimiento. Por favor no utilizar hasta que sea habilitado nuevamente.';
+    alerta.textContent = '⛔ NO UTILIZAR EL SISTEMA EN ESTE MOMENTO';
+    alerta.className = 'bloqueo-alerta ambar';
+  } else if (tipo === 'alumnos_off') {
+    icono.textContent = '🎒';
+    titulo.textContent = 'Portal de alumnos deshabilitado';
+    texto.textContent = 'El acceso para estudiantes está desactivado desde el panel administrativo. Solo docentes pueden utilizar el sistema.';
+    alerta.textContent = '🚫 ACCESO DE ALUMNOS DESACTIVADO';
+  } else {
+    icono.textContent = '📴';
+    titulo.textContent = 'No se pudo verificar el sistema';
+    texto.textContent = 'No fue posible confirmar si el portal está activo. Revise la conexión a internet y vuelva a verificar.';
+    alerta.textContent = '⚠ VERIFICACIÓN PENDIENTE';
+  }
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function ocultarBloqueoPWA() {
+  const overlay = document.getElementById('pantalla-bloqueo-pwa');
+  if (overlay) overlay.style.display = 'none';
+  document.body.style.overflow = '';
+}
+function desbloqueoTemporalPWA() {
+  const pass = prompt('Código administrativo:');
+  if (pass === PASS_OVERRIDE) {
+    try { sessionStorage.setItem(PWA_UNLOCK_KEY, 'true'); } catch(_) {}
+    ocultarBloqueoPWA();
+    notif('✅ Acceso temporal concedido en esta sesión.', 'ok', 3500);
+  } else if (pass !== null) {
+    notif('❌ Código incorrecto.', 'error', 3500);
+  }
+}
+
 
 // ════════════════════════════════════════════════════════════
 // FETCH helper — fetch() primero (GAS soporta CORS), JSONP fallback
@@ -797,13 +1006,14 @@ async function cargarHorario() {
     const h = await fetchJsonp(SCRIPT_URL + '?tipo=horario_asistencia', 10000);
     try { localStorage.setItem('horario_asistencia', JSON.stringify(h)); } catch(_) {}
     if (h.mantenimiento === true) {
-      mostrarBannerSistema('mantenimiento', '🔧 Sistema en mantenimiento. Intente más tarde.');
-      return;
-    }
-    if (h.activo === false) {
-      mostrarBannerSistema('apagado', '🔒 El portal de alumnos está desactivado temporalmente.');
-      return;
-    }
+        mostrarBloqueoPWA('mantenimiento');
+        return;
+      }
+      if (h.activo === false) {
+        mostrarBloqueoPWA('alumnos_off');
+        return;
+      }
+      ocultarBloqueoPWA();
     actualizarChip(h);
     return;
   } catch(e) {
@@ -822,6 +1032,7 @@ async function cargarHorario() {
 
   chip.className = 'horario-chip inactive';
   chip.textContent = '⚠ No se pudo verificar el horario';
+  mostrarBloqueoPWA('offline');
 }
 
 function mostrarBannerSistema(tipo, msg) {
@@ -1196,6 +1407,19 @@ function fetchConTimeout(url, ms=8000) {
   return fetch(url, { signal: ctrl.signal })
     .finally(() => clearTimeout(tid));
 }
+
+
+// ════════════════════════════════════════════════════════════
+// PWA: registrar Service Worker si el archivo sw.js está disponible
+// ════════════════════════════════════════════════════════════
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js').catch(function(err) {
+      console.warn('[INMU] Service Worker no registrado:', err);
+    });
+  });
+}
+
 </script>
 </body>
 </html>
