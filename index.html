@@ -100,7 +100,6 @@
     color: var(--text-primary);
   }
 
-
   /* ── HEADER ── */
   .header {
     width: 100%;
@@ -135,7 +134,7 @@
   }
   .btn-theme:hover { opacity: .8; }
 
-  /* ── BARRA DOCENTE (solo visible cuando usó el código administrativo) ── */
+  /* ── BARRA DOCENTE ── */
   #barra-docente {
     display: none;
     align-items: center;
@@ -221,7 +220,6 @@
     position: relative;
     overflow: hidden;
   }
-  /* Marca de agua dentro de cada card */
   .card::after {
     content: '';
     position: absolute;
@@ -241,7 +239,6 @@
   [data-theme="light"] .card::after {
     --wm-filter: none;
   }
-  /* El contenido del card siempre encima */
   .card > * { position: relative; z-index: 1; }
 
   /* ── SELECTOR TIPO DOCUMENTO ── */
@@ -452,12 +449,11 @@
   .view { display: none; }
   .view.active { display: block; }
 
-  /* ── Logos SVG: invertir en modo oscuro para que se vean blancos ── */
+  /* ── Logos SVG ── */
   [data-theme="dark"] img[src*=".svg"],
   [data-theme="dark"] img[src*="svg"] {
     filter: brightness(0) invert(1) drop-shadow(0 2px 6px rgba(255,255,255,0.15));
   }
-  /* Footer sistema — responde al tema */
   [data-theme="dark"] #footer-alumno {
     background: #0d1117;
     border-top-color: rgba(255,255,255,0.06);
@@ -472,151 +468,101 @@
   [data-theme="light"] #footer-fecha-alumno { color: #fff !important; }
   [data-theme="light"] #footer-alumno div,
   [data-theme="light"] #footer-alumno span { color: rgba(255,255,255,0.85) !important; }
-
-  /* logo2.svg en footer — efecto suave en oscuro */
   [data-theme="dark"] footer img[src*="logo2"] {
     filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(255,255,255,0.2));
     opacity: 0.9;
   }
-  /* En modo claro los SVGs se ven normales */
   [data-theme="light"] img[src*=".svg"],
   [data-theme="light"] img[src*="svg"] {
     filter: none;
   }
 
-
-/* ═══════════════════════════════════════════════════════════════
-   PANTALLA COMPLETA DE BLOQUEO — PWA / MANTENIMIENTO / ALUMNOS OFF
-   No altera el diseño original: solo se muestra cuando el backend lo indica.
-═══════════════════════════════════════════════════════════════ */
-#pantalla-bloqueo-pwa {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  background:
-    radial-gradient(circle at top, rgba(79,142,247,0.16), transparent 34%),
-    linear-gradient(135deg, #020617 0%, #0d1117 46%, #111827 100%);
-  color: #f8fafc;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 28px 18px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-#pantalla-bloqueo-pwa .bloqueo-card {
-  width: min(440px, 100%);
-  border: 1px solid rgba(255,255,255,0.10);
-  border-radius: 24px;
-  background: rgba(15, 23, 42, 0.76);
-  box-shadow: 0 24px 80px rgba(0,0,0,0.65);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  padding: 30px 24px;
-  position: relative;
-  overflow: hidden;
-}
-#pantalla-bloqueo-pwa .bloqueo-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url('marca de agua.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 75%;
-  opacity: .08;
-  filter: brightness(0) invert(1);
-  pointer-events: none;
-}
-#pantalla-bloqueo-pwa .bloqueo-content { position: relative; z-index: 1; }
-#pantalla-bloqueo-pwa .bloqueo-logo {
-  width: 118px;
-  height: 118px;
-  object-fit: contain;
-  margin: 0 auto 14px;
-  display: block;
-  filter: brightness(0) invert(1) drop-shadow(0 4px 14px rgba(255,255,255,.16));
-}
-#pantalla-bloqueo-pwa .bloqueo-icono {
-  font-size: 58px;
-  line-height: 1;
-  margin-bottom: 10px;
-}
-#pantalla-bloqueo-pwa .bloqueo-titulo {
-  font-size: 27px;
-  line-height: 1.08;
-  font-weight: 900;
-  letter-spacing: -.03em;
-  margin: 8px 0 10px;
-  text-transform: uppercase;
-}
-#pantalla-bloqueo-pwa .bloqueo-texto {
-  font-size: 14px;
-  line-height: 1.55;
-  color: #cbd5e1;
-  margin: 0 0 18px;
-}
-#pantalla-bloqueo-pwa .bloqueo-alerta {
-  border-radius: 15px;
-  padding: 14px 15px;
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1.45;
-  margin: 16px 0 16px;
-}
-#pantalla-bloqueo-pwa .bloqueo-alerta.rojo {
-  background: rgba(239,68,68,.15);
-  border: 1.5px solid rgba(239,68,68,.45);
-  color: #fecaca;
-}
-#pantalla-bloqueo-pwa .bloqueo-alerta.ambar {
-  background: rgba(245,158,11,.16);
-  border: 1.5px solid rgba(245,158,11,.48);
-  color: #fde68a;
-}
-#pantalla-bloqueo-pwa .bloqueo-botones {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 14px;
-}
-#pantalla-bloqueo-pwa .bloqueo-btn {
-  border: none;
-  border-radius: 14px;
-  padding: 13px 16px;
-  font-family: inherit;
-  font-weight: 800;
-  cursor: pointer;
-  transition: transform .12s ease, opacity .2s ease;
-}
-#pantalla-bloqueo-pwa .bloqueo-btn:active { transform: scale(.98); }
-#pantalla-bloqueo-pwa .bloqueo-btn.admin {
-  background: linear-gradient(135deg, #4f8ef7, #3b7de8);
-  color: white;
-}
-#pantalla-bloqueo-pwa .bloqueo-btn.reload {
-  background: rgba(255,255,255,.08);
-  color: #cbd5e1;
-  border: 1px solid rgba(255,255,255,.12);
-}
-#pantalla-bloqueo-pwa .bloqueo-footer {
-  margin-top: 18px;
-  font-size: 10.5px;
-  color: #94a3b8;
-  line-height: 1.4;
-}
-@media (display-mode: standalone) {
-  #pantalla-bloqueo-pwa { padding-top: max(28px, env(safe-area-inset-top)); }
-}
-
+  /* ── PANTALLA BLOQUEO PWA ── */
+  #pantalla-bloqueo-pwa {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background:
+      radial-gradient(circle at top, rgba(79,142,247,0.16), transparent 34%),
+      linear-gradient(135deg, #020617 0%, #0d1117 46%, #111827 100%);
+    color: #f8fafc;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 28px 18px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #pantalla-bloqueo-pwa .bloqueo-card {
+    width: min(440px, 100%);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 24px;
+    background: rgba(15, 23, 42, 0.76);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.65);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 30px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  #pantalla-bloqueo-pwa .bloqueo-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('marca de agua.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 75%;
+    opacity: .08;
+    filter: brightness(0) invert(1);
+    pointer-events: none;
+  }
+  #pantalla-bloqueo-pwa .bloqueo-content { position: relative; z-index: 1; }
+  #pantalla-bloqueo-pwa .bloqueo-logo {
+    width: 118px; height: 118px; object-fit: contain;
+    margin: 0 auto 14px; display: block;
+    filter: brightness(0) invert(1) drop-shadow(0 4px 14px rgba(255,255,255,.16));
+  }
+  #pantalla-bloqueo-pwa .bloqueo-icono { font-size: 58px; line-height: 1; margin-bottom: 10px; }
+  #pantalla-bloqueo-pwa .bloqueo-titulo {
+    font-size: 27px; line-height: 1.08; font-weight: 900;
+    letter-spacing: -.03em; margin: 8px 0 10px; text-transform: uppercase;
+  }
+  #pantalla-bloqueo-pwa .bloqueo-texto { font-size: 14px; line-height: 1.55; color: #cbd5e1; margin: 0 0 18px; }
+  #pantalla-bloqueo-pwa .bloqueo-alerta {
+    border-radius: 15px; padding: 14px 15px;
+    font-size: 13px; font-weight: 800; line-height: 1.45; margin: 16px 0 16px;
+  }
+  #pantalla-bloqueo-pwa .bloqueo-alerta.rojo {
+    background: rgba(239,68,68,.15); border: 1.5px solid rgba(239,68,68,.45); color: #fecaca;
+  }
+  #pantalla-bloqueo-pwa .bloqueo-alerta.ambar {
+    background: rgba(245,158,11,.16); border: 1.5px solid rgba(245,158,11,.48); color: #fde68a;
+  }
+  #pantalla-bloqueo-pwa .bloqueo-botones { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  #pantalla-bloqueo-pwa .bloqueo-btn {
+    border: none; border-radius: 14px; padding: 13px 16px;
+    font-family: inherit; font-weight: 800; cursor: pointer;
+    transition: transform .12s ease, opacity .2s ease;
+  }
+  #pantalla-bloqueo-pwa .bloqueo-btn:active { transform: scale(.98); }
+  #pantalla-bloqueo-pwa .bloqueo-btn.admin {
+    background: linear-gradient(135deg, #4f8ef7, #3b7de8); color: white;
+  }
+  #pantalla-bloqueo-pwa .bloqueo-btn.reload {
+    background: rgba(255,255,255,.08); color: #cbd5e1;
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  #pantalla-bloqueo-pwa .bloqueo-footer { margin-top: 18px; font-size: 10.5px; color: #94a3b8; line-height: 1.4; }
+  @media (display-mode: standalone) {
+    #pantalla-bloqueo-pwa { padding-top: max(28px, env(safe-area-inset-top)); }
+  }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     OVERLAY FULLSCREEN: Bloqueo PWA / mantenimiento / portal alumnos off
-═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY BLOQUEO PWA -->
 <div id="pantalla-bloqueo-pwa" role="dialog" aria-modal="true" aria-labelledby="bloqueo-pwa-titulo">
   <div class="bloqueo-card">
     <div class="bloqueo-content">
@@ -634,7 +580,6 @@
   </div>
 </div>
 
-
 <div id="notif"></div>
 
 <!-- HEADER -->
@@ -650,7 +595,6 @@
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-    <!-- Barra docente: solo visible tras ingresar código administrativo con portal bloqueado -->
     <div id="barra-docente">
       <button type="button" class="btn-docente enviar" onclick="docenteEnviarAsistencia()"
         title="Permite marcar asistencia aunque el portal esté desactivado para alumnos">
@@ -672,13 +616,11 @@
 <!-- BODY -->
 <div class="page-body">
 
-  <!-- ══ VISTA LOGIN ══ -->
+  <!-- VISTA LOGIN -->
   <div class="view active" id="v-login">
-
     <div class="title-section">
       <div style="display:flex;justify-content:center;align-items:center;margin-bottom:14px;">
-        <img src="Escudo_de_El_Salvador.svg"
-             alt="Escudo El Salvador"
+        <img src="Escudo_de_El_Salvador.svg" alt="Escudo El Salvador"
              onerror="this.style.display='none'"
              style="width:128px;height:128px;">
       </div>
@@ -689,7 +631,7 @@
         <strong id="fecha-hoy">—</strong>
       </div>
       <div class="title-sub" style="margin-top:8px;">
-         <strong id="tecnico-nombre"></strong>
+        <strong id="tecnico-nombre"></strong>
       </div>
     </div>
 
@@ -699,20 +641,15 @@
     <div id="card-verificar">
     <div class="card">
 
-      <!-- Horario chip -->
       <div class="horario-chip loading" id="horario-chip">⏰ Verificando sistema...</div>
 
-      <!-- Separador -->
       <div class="divider-label">Verifica tu asistencia</div>
 
-      <!-- Tipo documento -->
       <div class="field-label"><span class="req">*</span> Tipo de documento</div>
       <select class="campo" id="tipo-doc" onchange="onTipoChange()">
         <option value="nie">NIE</option>
-
       </select>
 
-      <!-- NIE / Documento -->
       <div class="field-label" style="margin-top:16px;"><span class="req">*</span> <span id="lbl-campo">NIE</span></div>
       <div class="nie-row">
         <input class="campo" type="text" id="input-doc"
@@ -725,7 +662,6 @@
         </button>
       </div>
 
-      <!-- Resultado verificación -->
       <div class="result-box" id="result-box">
         <div class="result-check">✅</div>
         <div>
@@ -734,19 +670,16 @@
         </div>
       </div>
 
-      <!-- Error verificación -->
       <div class="result-box error" id="result-error" style="display:none;">
         <div class="result-error-text" id="result-error-text">No se encontró ningún alumno.</div>
       </div>
 
-      <!-- Ya marcado hoy -->
       <div class="ya-marcado-box" id="ya-marcado-box">
         <div class="ym-icon">✅</div>
         <div class="ym-title" id="ym-title">Ya registraste tu asistencia hoy</div>
         <div class="ym-sub" id="ym-sub">Tu presencia fue marcada correctamente.</div>
       </div>
 
-      <!-- Botón validar -->
       <div style="margin-top:20px;">
         <button class="btn-validar" id="btn-validar" onclick="validarAsistencia()" disabled>
           Valida tu Asistencia
@@ -757,10 +690,10 @@
       </div>
 
     </div>
-    </div><!-- /card-verificar -->
+    </div>
   </div>
 
-  <!-- ══ VISTA ÉXITO ══ -->
+  <!-- VISTA ÉXITO -->
   <div class="view" id="v-exito">
     <div class="title-section">
       <div class="title-badge"><span class="dot"></span> Registrado</div>
@@ -778,7 +711,8 @@
         <div style="font-size:13px;color:var(--success-text);font-weight:600;">Asistencia registrada con éxito</div>
         <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" id="exito-hora">—</div>
       </div>
-      <button id="btn-volver-exito" class="btn-validar" onclick="volverAlInicio();" style="background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 20px rgba(79,142,247,0.35);">
+      <button id="btn-volver-exito" class="btn-validar" onclick="volverAlInicio();"
+        style="background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 20px rgba(79,142,247,0.35);">
         ← Volver al inicio
       </button>
     </div>
@@ -786,7 +720,7 @@
 
 </div><!-- /page-body -->
 
-<!-- FOOTER SISTEMA -->
+<!-- FOOTER -->
 <footer id="footer-alumno" style="
   width:100%;
   background: var(--card-bg, #1e293b);
@@ -798,22 +732,14 @@
   align-items: center;
   gap: 14px;
 ">
-  <!-- Logo MINED -->
-  <img src="logo2.svg"
-       alt="Logo MINED"
-       onerror="this.style.display='none'"
+  <img src="logo2.svg" alt="Logo MINED" onerror="this.style.display='none'"
        style="height:110px;max-width:85vw;width:auto;opacity:.85;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.25));">
 
-  <!-- Grid de info -->
   <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:10px 28px;max-width:600px;width:100%;text-align:center;">
-
-    <!-- Versión -->
     <div>
       <div style="font-size:10px;opacity:.55;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);">Sistema INMU</div>
       <div id="footer-ver-alumno" style="font-size:15px;font-weight:800;color:var(--text-primary);letter-spacing:.3px;">v1.90</div>
     </div>
-
-    <!-- Soporte -->
     <div style="border-left:1px solid rgba(255,255,255,0.1);padding-left:22px;">
       <div style="font-size:10px;opacity:.55;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);">Soporte &amp; Errores</div>
       <a href="https://wa.me/50369642170" target="_blank"
@@ -821,16 +747,12 @@
         📲 +503 6964-2170
       </a>
     </div>
-
-    <!-- Fecha -->
     <div style="border-left:1px solid rgba(255,255,255,0.1);padding-left:22px;">
       <div style="font-size:10px;opacity:.55;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);">Fecha del sistema</div>
       <div id="footer-fecha-alumno" style="font-size:13px;font-weight:600;color:var(--text-primary);margin-top:2px;"></div>
     </div>
-
   </div>
 
-  <!-- Copyright -->
   <div style="font-size:10.5px;opacity:.5;color:var(--text-muted);text-align:center;border-top:1px solid rgba(255,255,255,0.07);padding-top:10px;width:100%;max-width:500px;">
     © <span id="footer-year-alumno"></span> Todos los derechos reservados —
     Desarrollado por <strong style="opacity:.85;color:var(--text-secondary);">Emerson Castro</strong> · Técnico Web INMU
@@ -838,7 +760,7 @@
 </footer>
 
 <script>
-// ── Footer alumno: fecha, año y versión ───────────────────────────
+// ── Footer: fecha, año y versión ─────────────────────────────────────────────
 (function() {
   var meses = ['enero','febrero','marzo','abril','mayo','junio',
                'julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -853,7 +775,6 @@
   if (fe) fe.textContent = fechaStr;
   if (ye) ye.textContent = ahora.getFullYear();
 
-  // Versión con autoincremento por cambios detectados
   var VERSION_BASE = 1.90;
   var storedVer  = parseFloat(localStorage.getItem('inmu_alumno_ver') || '0');
   var storedHash = localStorage.getItem('inmu_alumno_hash') || '';
@@ -877,17 +798,16 @@
 // ════════════════════════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════════════════════════
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKnxasl94QOwaLx2QZMDNnfNG8NTtnWg1agE9shf9cyeYeP1PsgtUjbu4X94lXRSIM/exec";
-const PASS_OVERRIDE = "747-8"; // Contraseña para permitir marcado desde dispositivo ya usado
-const TECNICO = "";
-const DEVICE_KEY = 'inmu_device_used_today'; // localStorage key para bloqueo por dispositivo
+const SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbxKnxasl94QOwaLx2QZMDNnfNG8NTtnWg1agE9shf9cyeYeP1PsgtUjbu4X94lXRSIM/exec";
+const PASS_OVERRIDE = "747-8";
+const TECNICO       = "";
+const DEVICE_KEY    = 'inmu_device_used_today';
 
 // ════════════════════════════════════════════════════════════
-// BLOQUEO FULLSCREEN PWA — mantenimiento / alumnos desactivado
-// Desbloqueo temporal: solo dura esta pestaña/sesión.
+// BLOQUEO FULLSCREEN PWA
 // ════════════════════════════════════════════════════════════
-const PWA_UNLOCK_KEY    = 'inmu_pwa_unlock_temporal';
-const MODO_BLOQUEO_KEY  = 'inmu_modo_bloqueo'; // 'alumnos_off' | 'mantenimiento' | 'offline' | ''
+const PWA_UNLOCK_KEY   = 'inmu_pwa_unlock_temporal';
+const MODO_BLOQUEO_KEY = 'inmu_modo_bloqueo';
 
 function pwaEstaDesbloqueadoTemporalmente() {
   try { return sessionStorage.getItem(PWA_UNLOCK_KEY) === 'true'; } catch(_) { return false; }
@@ -895,7 +815,6 @@ function pwaEstaDesbloqueadoTemporalmente() {
 
 function mostrarBloqueoPWA(tipo) {
   if (pwaEstaDesbloqueadoTemporalmente()) return;
-  // Guardar tipo de bloqueo activo para usarlo al volver
   try { sessionStorage.setItem(MODO_BLOQUEO_KEY, tipo); } catch(_) {}
 
   const overlay = document.getElementById('pantalla-bloqueo-pwa');
@@ -903,7 +822,7 @@ function mostrarBloqueoPWA(tipo) {
   const titulo  = document.getElementById('bloqueo-pwa-titulo');
   const texto   = document.getElementById('bloqueo-pwa-texto');
   const alerta  = document.getElementById('bloqueo-pwa-alerta');
-  if (!overlay || !icono || !titulo || !texto || !alerta) return;
+  if (!overlay) return;
 
   alerta.className = 'bloqueo-alerta rojo';
   if (tipo === 'mantenimiento') {
@@ -925,8 +844,6 @@ function mostrarBloqueoPWA(tipo) {
   }
   overlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';
-
-  // Ocultar barra docente si se vuelve a mostrar el bloqueo
   _ocultarBarraDocente();
 }
 
@@ -936,22 +853,19 @@ function ocultarBloqueoPWA() {
   document.body.style.overflow = '';
 }
 
-// ── Código administrativo ─────────────────────────────────────────────
 function desbloqueoTemporalPWA() {
   const pass = prompt('Código administrativo:');
-  if (pass === null) return; // canceló
+  if (pass === null) return;
   if (pass !== PASS_OVERRIDE) {
     notif('❌ Código incorrecto.', 'error', 3500);
     return;
   }
-  // Marcar sesión como desbloqueada para docente
   try { sessionStorage.setItem(PWA_UNLOCK_KEY, 'true'); } catch(_) {}
   ocultarBloqueoPWA();
   _mostrarBarraDocente();
   notif('✅ Acceso docente concedido. Solo en este dispositivo.', 'ok', 4000);
 }
 
-// ── Barra docente (visible solo tras código administrativo con portal bloqueado) ──
 function _mostrarBarraDocente() {
   const barra = document.getElementById('barra-docente');
   if (barra) barra.style.display = 'flex';
@@ -961,40 +875,27 @@ function _ocultarBarraDocente() {
   if (barra) barra.style.display = 'none';
 }
 
-// Botón "Salir": limpia la sesión docente y vuelve a mostrar el bloqueo
 function docenteSalir() {
   try { sessionStorage.removeItem(PWA_UNLOCK_KEY); } catch(_) {}
   _ocultarBarraDocente();
-  // Recuperar el tipo de bloqueo que estaba activo
   let tipo = 'alumnos_off';
   try { tipo = sessionStorage.getItem(MODO_BLOQUEO_KEY) || 'alumnos_off'; } catch(_) {}
-  // Forzar mostrar bloqueo (pwaEstaDesbloqueadoTemporalmente() ya es false)
   mostrarBloqueoPWA(tipo);
-  // Limpiar el form por si quedó algo
   resetForm && resetForm();
 }
 
-// Botón "Enviar Asistencia Bloqueada": lleva al formulario como modo docente especial
-// Al terminar (éxito), vuelve a mostrar el bloqueo en lugar del inicio normal
 function docenteEnviarAsistencia() {
-  // Scroll al inicio y asegurar vista login visible
   irA('v-login');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   notif('👨‍🏫 Modo docente: marca asistencia y el sistema seguirá bloqueado para los demás.', 'ok', 5000);
-  // Marcar que al finalizar la asistencia debe volver al bloqueo
   try { sessionStorage.setItem('inmu_docente_modo_bloqueo', 'true'); } catch(_) {}
 }
 
-
 // ════════════════════════════════════════════════════════════
-// FETCH helper — fetch() primero (GAS soporta CORS), JSONP fallback
+// CACHÉ GAS
 // ════════════════════════════════════════════════════════════
-// ══════════════════════════════════════════════════════════════════════════════
-// CACHÉ LOCAL — respuesta instantánea desde localStorage mientras el servidor responde
-// ══════════════════════════════════════════════════════════════════════════════
-
 const GAS_CACHE_PREFIX = 'gas_cache_';
-const GAS_CACHE_TTL    = 8 * 60 * 1000; // 8 minutos en ms
+const GAS_CACHE_TTL    = 8 * 60 * 1000;
 
 function gasCache_get(url) {
   try {
@@ -1020,19 +921,14 @@ function gasCache_invalidate(prefix) {
   } catch(e) {}
 }
 
-// fetchGAS con stale-while-revalidate:
-// 1) Devuelve caché local INMEDIATAMENTE si existe (respuesta instantánea)
-// 2) En paralelo actualiza el caché desde el servidor
 async function fetchGASCached(url, timeoutMs, forceRefresh) {
   const cached = forceRefresh ? null : gasCache_get(url);
   if (cached !== null) {
-    // Actualizar en background sin bloquear
     fetchGAS(url, timeoutMs).then(fresh => {
       if (fresh) gasCache_set(url, fresh);
     }).catch(() => {});
     return cached;
   }
-  // Sin caché: esperar al servidor
   const data = await fetchGAS(url, timeoutMs || 15000);
   if (data) gasCache_set(url, data);
   return data;
@@ -1042,7 +938,6 @@ function fetchGAS(url, timeoutMs) {
   timeoutMs = timeoutMs || 12000;
   const cleanUrl = url.replace(/[&?]callback=[^&]*/g, '');
 
-  // Método 1: fetch normal
   const p1 = new Promise((res, rej) => {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), timeoutMs - 2000);
@@ -1051,7 +946,6 @@ function fetchGAS(url, timeoutMs) {
       .then(res).catch(e => { clearTimeout(tid); rej(e); });
   });
 
-  // Método 2: JSONP fallback
   const p2 = new Promise((res, rej) => {
     const cb = '__cb_' + Math.random().toString(36).slice(2);
     const s  = document.createElement('script');
@@ -1064,7 +958,6 @@ function fetchGAS(url, timeoutMs) {
     document.head.appendChild(s);
   });
 
-  // Método 3: proxy CORS como último recurso si fetch y JSONP fallan
   const p3 = fetch('https://corsproxy.io/?' + encodeURIComponent(cleanUrl), { cache: 'no-cache' })
     .then(r => { if (!r.ok) throw new Error('proxy_' + r.status); return r.json(); });
 
@@ -1075,7 +968,6 @@ function fetchGAS(url, timeoutMs) {
 // BLOQUEO POR DISPOSITIVO
 // ════════════════════════════════════════════════════════════
 function getHoyStr() {
-  // FIX: usar fecha LOCAL (no UTC) para evitar desfase en zona horaria El Salvador (UTC-6)
   const d = new Date();
   return d.getFullYear() + '-'
     + String(d.getMonth() + 1).padStart(2, '0') + '-'
@@ -1099,25 +991,24 @@ function marcarDispositivoUsado(nie, nombre) {
 function getDatosDispositivoHoy() {
   try { return JSON.parse(localStorage.getItem(DEVICE_KEY) || 'null'); } catch(_) { return null; }
 }
-let expiraTimer  = null;
+
+let expiraTimer    = null;
 let expirationDate = null;
+let alumnoActual   = null;
 
 // ════════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  // Fecha de hoy
   const hoy = new Date();
   document.getElementById('fecha-hoy').textContent = hoy.toLocaleDateString('es-ES', {
     day:'2-digit', month:'2-digit', year:'numeric'
   }).replace(/\//g,'/');
   document.getElementById('tecnico-nombre').textContent = TECNICO;
 
-  // Tema guardado
   const savedTheme = localStorage.getItem('tema_portalEstudiante') || 'dark';
   setTheme(savedTheme);
 
-  // Si la sesión docente sigue activa (misma pestaña), mostrar barra
   if (pwaEstaDesbloqueadoTemporalmente()) {
     _mostrarBarraDocente();
   }
@@ -1139,29 +1030,21 @@ function setTheme(t) {
 }
 
 // ════════════════════════════════════════════════════════════
-// FETCH helper — intenta fetch() primero, luego JSONP como fallback
-// GAS publica CORS headers automáticamente si está publicado como "Anyone"
+// FETCH JSONP
 // ════════════════════════════════════════════════════════════
 function fetchJsonp(url, timeoutMs) {
   timeoutMs = timeoutMs || 12000;
-  // Limpiar parámetro callback residual
   const cleanUrl = url.replace(/[&?]callback=[^&]*/g, '');
 
-  // Intento 1: fetch() normal (funciona si GAS está bien publicado)
   const fetchPromise = new Promise((resolve, reject) => {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), timeoutMs - 2000);
     fetch(cleanUrl, { signal: ctrl.signal, redirect: 'follow' })
-      .then(r => {
-        clearTimeout(tid);
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
+      .then(r => { clearTimeout(tid); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(resolve)
       .catch(err => { clearTimeout(tid); reject(err); });
   });
 
-  // Intento 2: JSONP clásico como fallback
   const jsonpPromise = new Promise((resolve, reject) => {
     const cb = '__cb_' + Math.random().toString(36).slice(2);
     const script = document.createElement('script');
@@ -1178,42 +1061,64 @@ function fetchJsonp(url, timeoutMs) {
     document.head.appendChild(script);
   });
 
-  // Race: el primero que resuelva gana
   return Promise.any([fetchPromise, jsonpPromise])
     .catch(() => { throw new Error('Ambos métodos fallaron'); });
 }
 
 // ════════════════════════════════════════════════════════════
-// HORARIO + ESTADO DEL SISTEMA
+// *** FIX PRINCIPAL: cargarHorario con comparación segura ***
 // ════════════════════════════════════════════════════════════
 async function cargarHorario() {
   const chip = document.getElementById('horario-chip');
   chip.className = 'horario-chip loading';
   chip.textContent = '⏰ Verificando sistema...';
 
+  // Limpiar caché para forzar datos frescos del servidor
+  try { localStorage.removeItem('horario_asistencia'); } catch(_) {}
+
   try {
     const h = await fetchJsonp(SCRIPT_URL + '?tipo=horario_asistencia', 10000);
+
+    // Guardar respuesta fresca
     try { localStorage.setItem('horario_asistencia', JSON.stringify(h)); } catch(_) {}
+
     if (h.mantenimiento === true) {
-        mostrarBloqueoPWA('mantenimiento');
-        return;
-      }
-      // acceso_alumnos === false ó activo === false → portal deshabilitado
-      if (h.acceso_alumnos === false || h.activo === false) {
-        mostrarBloqueoPWA('alumnos_off');
-        return;
-      }
-      ocultarBloqueoPWA();
+      mostrarBloqueoPWA('mantenimiento');
+      return;
+    }
+
+    // FIX: comparación segura — cubre booleano false Y string "false"
+    const accesoAlumnos = h.acceso_alumnos !== false && h.acceso_alumnos !== 'false';
+    const activo        = h.activo         !== false && h.activo         !== 'false';
+
+    if (!accesoAlumnos || !activo) {
+      mostrarBloqueoPWA('alumnos_off');
+      return;
+    }
+
+    ocultarBloqueoPWA();
     actualizarChip(h);
     return;
+
   } catch(e) {
     console.error('[INMU] Error cargando horario:', e);
   }
 
-  // Fallback: caché local
+  // Fallback: caché local (solo si el servidor no respondió)
   try {
     const cached = JSON.parse(localStorage.getItem('horario_asistencia') || '{}');
     if (cached.inicio) {
+      const accesoAlumnos = cached.acceso_alumnos !== false && cached.acceso_alumnos !== 'false';
+      const activo        = cached.activo         !== false && cached.activo         !== 'false';
+
+      if (cached.mantenimiento === true) {
+        mostrarBloqueoPWA('mantenimiento');
+        return;
+      }
+      if (!accesoAlumnos || !activo) {
+        mostrarBloqueoPWA('alumnos_off');
+        return;
+      }
       actualizarChip(cached);
       notif('📴 Sin conexión — usando horario guardado.', 'info', 4000);
       return;
@@ -1241,6 +1146,7 @@ function mostrarBannerSistema(tipo, msg) {
   }
   if (cardV) cardV.style.display = 'none';
 }
+
 function actualizarChip(h) {
   const chip   = document.getElementById('horario-chip');
   const dentro = dentroDelHorario(h);
@@ -1249,12 +1155,14 @@ function actualizarChip(h) {
     ? `✅ <strong>Sistema Activo</strong> &mdash; Horario: ${h.inicio} &ndash; ${h.fin}`
     : `🔴 Fuera del horario de marcado: <strong>${h.inicio} &ndash; ${h.fin}</strong>`;
 }
+
 function getHorario() {
   try {
     const h = JSON.parse(localStorage.getItem('horario_asistencia') || '{}');
     return { inicio: h.inicio || '06:30', fin: h.fin || '08:10' };
   } catch(e) { return { inicio: '06:30', fin: '08:10' }; }
 }
+
 function dentroDelHorario(h) {
   h = h || getHorario();
   const [hi, hm] = (h.inicio||'06:30').split(':').map(Number);
@@ -1271,9 +1179,9 @@ function onTipoChange() {
   const tipo = document.getElementById('tipo-doc').value;
   const lbl  = document.getElementById('lbl-campo');
   const inp  = document.getElementById('input-doc');
-  const labels = { nie: 'NIE', dui: 'DUI', nombre: 'Nombre completo' };
+  const labels      = { nie: 'NIE', dui: 'DUI', nombre: 'Nombre completo' };
   const placeholders = { nie: 'Ej: 19910934', dui: 'Ej: 04567890-8', nombre: 'Apellido, Nombre' };
-  const modes = { nie: 'numeric', dui: 'text', nombre: 'text' };
+  const modes       = { nie: 'numeric', dui: 'text', nombre: 'text' };
   lbl.textContent = labels[tipo] || 'NIE';
   inp.placeholder = placeholders[tipo] || '';
   inp.inputMode   = modes[tipo] || 'text';
@@ -1287,7 +1195,6 @@ async function verificarAlumno() {
   const query = (document.getElementById('input-doc').value || '').trim();
   if (!query) { notif('Ingresa tu NIE o datos.', 'error'); return; }
 
-  // ── Bloqueo por dispositivo ──────────────────────────────
   if (dispositivoYaUsadoHoy()) {
     const datos = getDatosDispositivoHoy();
     const msg = datos
@@ -1301,7 +1208,6 @@ async function verificarAlumno() {
 }
 
 function mostrarModalDispositivo(msg, query) {
-  // Crear modal inline
   let overlay = document.getElementById('modal-dispositivo');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -1338,7 +1244,6 @@ async function _modalDispositivoConfirmar(query) {
     return;
   }
   _cerrarModalDispositivo();
-  // Marcar como override: resetear bloqueo para esta sesión
   try { localStorage.removeItem(DEVICE_KEY); } catch(_) {}
   await _ejecutarVerificacion(query);
 }
@@ -1376,7 +1281,6 @@ async function _ejecutarVerificacion(query) {
 
     alumnoActual = alumno;
 
-    // Guardar en caché local
     try {
       const cache = JSON.parse(localStorage.getItem('cache_alumnos') || '[]');
       const idx   = cache.findIndex(a => a.nie == alumno.nie);
@@ -1422,7 +1326,7 @@ function mostrarResultadoOK(alumno) {
   const box = document.getElementById('result-box');
   document.getElementById('result-nombre').textContent = alumno.nombre || '—';
   document.getElementById('result-sub').textContent =
-    `Ya te has identificado correctamente. Ahora puedes validar tu asistencia.`;
+    'Ya te has identificado correctamente. Ahora puedes validar tu asistencia.';
   box.className = 'result-box success';
   box.style.display = 'flex';
 }
@@ -1440,16 +1344,15 @@ function mostrarYaMarcado(alumno) {
   document.getElementById('ym-sub').textContent   = 'Tu asistencia ya fue registrada para hoy.';
   box.style.display = 'block';
   document.getElementById('btn-validar').disabled = true;
-  // Mostrar igual el nombre
   mostrarResultadoOK(alumno);
 }
 
 function resetResult() {
   alumnoActual = null;
-  document.getElementById('result-box').className   = 'result-box';
+  document.getElementById('result-box').className    = 'result-box';
   document.getElementById('result-box').style.display = 'none';
-  document.getElementById('result-error').style.display  = 'none';
-  document.getElementById('ya-marcado-box').style.display = 'none';
+  document.getElementById('result-error').style.display   = 'none';
+  document.getElementById('ya-marcado-box').style.display  = 'none';
   document.getElementById('btn-validar').disabled = true;
   document.getElementById('expira-text').style.display = 'none';
   if (expiraTimer) { clearInterval(expiraTimer); expiraTimer = null; }
@@ -1467,18 +1370,16 @@ function habilitarValidacion() {
   const btn = document.getElementById('btn-validar');
   const h   = getHorario();
   const dentro = dentroDelHorario();
-  // En modo docente-bloqueado: habilitar siempre sin importar horario
   const modoDocente = _esModoDocenteBloqueado();
 
   btn.disabled = !dentro && !modoDocente;
 
-  // Calcular expiración: fin del horario de hoy
   const ahora = new Date();
   const [fi, fm] = (h.fin||'08:10').split(':').map(Number);
   const exp = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), fi, fm, 0);
   expirationDate = exp;
 
-  const expEl = document.getElementById('expira-text');
+  const expEl  = document.getElementById('expira-text');
   const expVal = document.getElementById('expira-val');
   expEl.style.display = 'flex';
   expVal.textContent = exp.toLocaleDateString('es-ES', {day:'2-digit',month:'2-digit',year:'numeric'})
@@ -1486,7 +1387,6 @@ function habilitarValidacion() {
 
   if (expiraTimer) clearInterval(expiraTimer);
   if (dentro && !modoDocente) {
-    // Countdown (solo en modo normal)
     expiraTimer = setInterval(() => {
       const secsLeft = Math.floor((expirationDate - new Date()) / 1000);
       if (secsLeft <= 0) {
@@ -1504,7 +1404,6 @@ function habilitarValidacion() {
 async function validarAsistencia() {
   if (!alumnoActual) { notif('Primero verifica tu identidad.', 'error'); return; }
 
-  // En modo docente-bloqueado, omitir restricción de horario
   if (!_esModoDocenteBloqueado() && !dentroDelHorario()) {
     const h = getHorario();
     notif(`⏰ Fuera del horario (${h.inicio}–${h.fin}).`, 'error', 4000);
@@ -1515,7 +1414,7 @@ async function validarAsistencia() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Registrando...';
 
-  const ahora   = new Date();
+  const ahora    = new Date();
   const fechaStr = ahora.toLocaleDateString('es-ES');
   const horaStr  = ahora.toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit'});
 
@@ -1531,7 +1430,6 @@ async function validarAsistencia() {
     hora:    horaStr
   };
 
-  // FIX: JSONP GET en lugar de POST (POST se pierde en redirect 302 de Google)
   const urlMarcar = SCRIPT_URL
     + '?tipo=marcar_alumno'
     + '&nie='          + encodeURIComponent(alumnoActual.nie     || '')
@@ -1540,10 +1438,10 @@ async function validarAsistencia() {
 
   try {
     const resp = await fetchGAS(urlMarcar, 15000);
-    const key  = `asist_${alumnoActual.nie}_${fechaStr.replace(/\\//g,'_')}`;
+    const key  = `asist_${alumnoActual.nie}_${fechaStr.replace(/\//g,'_')}`;
     try { localStorage.setItem(key, JSON.stringify(payload)); } catch(_) {}
     marcarDispositivoUsado(alumnoActual.nie, alumnoActual.nombre);
-    gasCache_invalidate(); // limpiar caché para que la próxima verificación sea fresca
+    gasCache_invalidate();
     mostrarExito(alumnoActual, (resp && resp.hora) || horaStr);
   } catch(e) {
     const key = `asist_offline_${alumnoActual.nie}_${Date.now()}`;
@@ -1560,9 +1458,7 @@ function mostrarExito(alumno, hora) {
     `${alumno.grado || '—'} · Sección ${alumno.seccion || '—'}`;
   document.getElementById('exito-hora').textContent = `Hora: ${hora}`;
 
-  // Si el docente envió asistencia mientras el sistema estaba bloqueado,
-  // mostrar botón "Volver al bloqueo" en lugar del botón normal
-  const btnVolver = document.getElementById('btn-volver-exito');
+  const btnVolver    = document.getElementById('btn-volver-exito');
   const enModoDocente = _esModoDocenteBloqueado();
   if (btnVolver) {
     if (enModoDocente) {
@@ -1581,22 +1477,19 @@ function _esModoDocenteBloqueado() {
 }
 
 // ════════════════════════════════════════════════════════════
-// VOLVER AL INICIO — restaura el botón "Valida tu Asistencia"
+// VOLVER AL INICIO
 // ════════════════════════════════════════════════════════════
 function volverAlInicio() {
-  // Si estaba en modo docente-bloqueado → volver al bloqueo, no al inicio
   if (_esModoDocenteBloqueado()) {
     try { sessionStorage.removeItem('inmu_docente_modo_bloqueo'); } catch(_) {}
     resetForm();
     const btn = document.getElementById('btn-validar');
     if (btn) { btn.disabled = true; btn.textContent = 'Valida tu Asistencia'; }
-    // Volver al bloqueo
     docenteSalir();
     return;
   }
   irA('v-login');
   resetForm();
-  // Asegurar que el botón validar quede en su estado normal (no "Registrando...")
   const btn = document.getElementById('btn-validar');
   if (btn) {
     btn.disabled = true;
@@ -1629,9 +1522,8 @@ function fetchConTimeout(url, ms=8000) {
     .finally(() => clearTimeout(tid));
 }
 
-
 // ════════════════════════════════════════════════════════════
-// PWA: registrar Service Worker si el archivo sw.js está disponible
+// PWA: Service Worker
 // ════════════════════════════════════════════════════════════
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
@@ -1640,7 +1532,6 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     });
   });
 }
-
 </script>
 </body>
 </html>
