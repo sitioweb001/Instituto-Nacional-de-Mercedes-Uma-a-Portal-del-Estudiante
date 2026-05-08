@@ -470,17 +470,9 @@
   [data-theme="light"] #footer-fecha-alumno { color: #fff !important; }
   [data-theme="light"] #footer-alumno div,
   [data-theme="light"] #footer-alumno span { color: rgba(255,255,255,0.85) !important; }
-  [data-theme="dark"] footer img[src*="logo2"] {
-    filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(255,255,255,0.2));
-    opacity: 0.9;
-  }
-  [data-theme="light"] img[src*="logo2.svg"] {
-    filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(0,0,0,0.18));
-    opacity: 0.95;
-  }
-  [data-theme="light"] img[src*=".svg"],
-  [data-theme="light"] img[src*="svg"] {
-    filter: none;
+  img[src*="logo2.svg"] {
+    filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(255,255,255,0.2)) !important;
+    opacity: 0.95 !important;
   }
 
   /* ── PANTALLA BLOQUEO PWA ── */
