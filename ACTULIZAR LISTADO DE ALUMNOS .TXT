@@ -1,0 +1,43 @@
+CODIGO ADMIN:
+               allow pasting
+
+
+CODIGO: 
+
+
+(async () => {
+  const config = {
+    apiKey: "AIzaSyCXILuuU2UZUZxG8iGkFpGN_mljN_e1ESc",
+    authDomain: "sica-inmu-2026.firebaseapp.com",
+    projectId: "sica-inmu-2026",
+    storageBucket: "sica-inmu-2026.firebasestorage.app",
+    messagingSenderId: "264940304462",
+    appId: "1:264940304462:web:643c263f1ad46139102b1f"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(config);
+  const db = firebase.firestore();
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKnxasl94QOwaLx2QZMDNnfNG8NTtnWg1agE9shf9cyeYeP1PsgtUjbu4X94lXRSIM/exec";
+  console.log('Obteniendo alumnos...');
+  const lista = await fetch(SCRIPT_URL + '?tipo=alumnos').then(r => r.json());
+  console.log('Total recibidos:', lista.length);
+  let total = 0;
+  let omitidos = 0;
+  for (let i = 0; i < lista.length; i += 400) {
+    const batch = db.batch();
+    lista.slice(i, i + 400).forEach(a => {
+      const nie = String(a.nie || '').trim();
+      if (!nie || nie === 'N/A' || nie === 'n/a' || nie === '0' || nie.includes('/')) {
+        omitidos++;
+        return;
+      }
+      batch.set(db.collection('alumnos_inmu').doc(nie), {
+        nie, nombre: a.nombre||'', grado: a.grado||'',
+        seccion: a.seccion||'', sexo: a.sexo||'', telefono: a.telefono||''
+      }, { merge: true });
+      total++;
+    });
+    await batch.commit();
+    console.log('Subidos:', total);
+  }
+  console.log('✅ COMPLETADO:', total, 'alumnos subidos,', omitidos, 'omitidos sin NIE válido');
+})();
