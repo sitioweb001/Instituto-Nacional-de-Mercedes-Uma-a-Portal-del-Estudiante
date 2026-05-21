@@ -128,15 +128,43 @@ async function _refrescarDesdeFirestore() {
 
 function _escucharHorario() {
   if (!_fbListo || !_fbDb) return;
-  _fbDb.collection('config_inmu').doc('horario')
+
+  // Primero intentar leer instantáneamente (get) para no esperar el snapshot
+  _fbDb.collection('config_inmu').doc('sistema').get().then(snap => {
+    if (!snap.exists) return;
+    const cfg = snap.data();
+    // El doc 'sistema' tiene horario_inicio, horario_fin, modo_alumno_activo
+    const h = {
+      inicio:         cfg.horario_inicio     || '07:00',
+      fin:            cfg.horario_fin        || '15:00',
+      activo:         cfg.modo_alumno_activo !== false,
+      acceso_alumnos: cfg.modo_alumno_activo !== false,
+      mantenimiento:  cfg.mantenimiento === true
+    };
+    try {
+      localStorage.setItem(FB_HORARIO_KEY, JSON.stringify(h));
+      localStorage.setItem(FB_HORARIO_TS_KEY, Date.now().toString());
+    } catch (_) {}
+    if (typeof actualizarChip === 'function') actualizarChip(h);
+    console.log('[FB-Alumno] Horario cargado instantáneamente desde Firebase ✓', h);
+  }).catch(e => console.warn('[FB-Alumno] Error leyendo horario:', e));
+
+  // También escuchar cambios en tiempo real
+  _fbDb.collection('config_inmu').doc('sistema')
     .onSnapshot(snap => {
       if (!snap.exists) return;
-      const h = snap.data();
+      const cfg = snap.data();
+      const h = {
+        inicio:         cfg.horario_inicio     || '07:00',
+        fin:            cfg.horario_fin        || '15:00',
+        activo:         cfg.modo_alumno_activo !== false,
+        acceso_alumnos: cfg.modo_alumno_activo !== false,
+        mantenimiento:  cfg.mantenimiento === true
+      };
       try {
         localStorage.setItem(FB_HORARIO_KEY, JSON.stringify(h));
         localStorage.setItem(FB_HORARIO_TS_KEY, Date.now().toString());
       } catch (_) {}
-      // Actualizar el chip de horario si está visible
       if (typeof actualizarChip === 'function') actualizarChip(h);
       console.log('[FB-Alumno] Horario actualizado en tiempo real ✓');
     }, e => {
