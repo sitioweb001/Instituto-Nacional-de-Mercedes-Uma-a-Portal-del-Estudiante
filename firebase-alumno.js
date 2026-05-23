@@ -200,7 +200,8 @@ function _buscarAlumnoLocal(query, tipo) {
 async function _yaMarcoHoyFirestore(nie) {
   if (!_fbListo || !_fbDb) return false;
   try {
-    const hoy  = new Date().toLocaleDateString('es-ES').replace(/\//g, '_');
+    const _n   = new Date();
+    const hoy  = String(_n.getDate()).padStart(2,'0') + '_' + String(_n.getMonth()+1).padStart(2,'0') + '_' + _n.getFullYear();
     const snap = await _fbDb.collection('asistencia_alumnos_inmu')
       .where('nie', '==', String(nie))
       .where('fecha_key', '==', hoy)
@@ -218,7 +219,8 @@ async function _yaMarcoHoyFirestore(nie) {
 async function _registrarAsistenciaFirestore(alumno, fechaStr, horaStr) {
   if (!_fbListo || !_fbDb) return false;
   try {
-    const hoy = fechaStr.replace(/\//g, '_');
+    const _n   = new Date();
+    const hoy  = String(_n.getDate()).padStart(2,'0') + '_' + String(_n.getMonth()+1).padStart(2,'0') + '_' + _n.getFullYear();
     const docId = `${String(alumno.nie)}_${hoy}`;
     await _fbDb.collection('asistencia_alumnos_inmu').doc(docId).set({
       nie:      String(alumno.nie),
@@ -277,8 +279,10 @@ async function _registrarAsistenciaFirestore(alumno, fechaStr, horaStr) {
           }
 
           // Verificar si ya marcó hoy (primero local, luego Firestore)
-          const hoy      = new Date().toLocaleDateString('es-ES');
-          const keyLocal = `asist_${alumno.nie}_${hoy.replace(/\//g,'_')}`;
+          const _nd    = new Date();
+          const hoy    = _nd.toLocaleDateString('es-ES');
+          const _hoyK  = String(_nd.getDate()).padStart(2,'0') + '_' + String(_nd.getMonth()+1).padStart(2,'0') + '_' + _nd.getFullYear();
+          const keyLocal = `asist_${alumno.nie}_${_hoyK}`;
           let yaMarcado  = false;
 
           try {
@@ -359,7 +363,8 @@ async function _registrarAsistenciaFirestore(alumno, fechaStr, horaStr) {
             marcarDispositivoUsado(window.alumnoActual.nie, window.alumnoActual.nombre);
           }
           // Guardar en localStorage también
-          const key = `asist_${window.alumnoActual.nie}_${fechaStr.replace(/\//g,'_')}`;
+          const _nm  = new Date();
+          const key  = `asist_${window.alumnoActual.nie}_${String(_nm.getDate()).padStart(2,'0')}_${String(_nm.getMonth()+1).padStart(2,'0')}_${_nm.getFullYear()}`;
           try { localStorage.setItem(key, JSON.stringify({ nie: window.alumnoActual.nie, fecha: fechaStr })); } catch (_) {}
 
           if (typeof mostrarExito === 'function') mostrarExito(window.alumnoActual, horaStr);
