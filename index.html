@@ -1064,93 +1064,68 @@ function fetchJsonp(url, timeoutMs) {
 }
 
 // ════════════════════════════════════════════════════════════
-// *** cargarHorario — Firebase primero, GAS como fallback ***
+// *** FIX PRINCIPAL: cargarHorario con comparación segura ***
 // ════════════════════════════════════════════════════════════
-function _aplicarHorario(h) {
-  if (!h || !h.inicio) return false;
-  const accesoAlumnos = h.acceso_alumnos !== false && h.acceso_alumnos !== 'false';
-  const activo        = h.activo         !== false && h.activo         !== 'false';
-  if (h.mantenimiento === true) { mostrarBloqueoPWA('mantenimiento'); return true; }
-  if (!accesoAlumnos || !activo) { mostrarBloqueoPWA('alumnos_off'); return true; }
-  ocultarBloqueoPWA();
-  actualizarChip(h);
-  return true;
-}
-
 async function cargarHorario() {
   const chip = document.getElementById('horario-chip');
   chip.className = 'horario-chip loading';
   chip.textContent = '⏰ Verificando sistema...';
 
-  // 1. Caché local instantánea (< 5ms) — NO borrar siempre
+  // Limpiar caché para forzar datos frescos del servidor
+  try { localStorage.removeItem('horario_asistencia'); } catch(_) {}
+
   try {
-    const ts = parseInt(localStorage.getItem('fb_horario_cache_ts') || '0');
-    const h  = JSON.parse(localStorage.getItem('fb_horario_cache') || 'null');
-    if (h && h.inicio && (Date.now() - ts) < 5 * 60 * 1000) {
-      console.log('[INMU] Horario desde caché local ✓');
-      _aplicarHorario(h);
-      // Refrescar en segundo plano sin bloquear
-      setTimeout(() => _cargarHorarioFirebase(), 500);
+    const h = await fetchJsonp(SCRIPT_URL + '?tipo=horario_asistencia', 10000);
+
+    // Guardar respuesta fresca
+    try { localStorage.setItem('horario_asistencia', JSON.stringify(h)); } catch(_) {}
+
+    if (h.mantenimiento === true) {
+      mostrarBloqueoPWA('mantenimiento');
       return;
     }
-  } catch(_) {}
 
-  // 2. Firebase (< 1 seg si conectado)
-  const fbOk = await _cargarHorarioFirebase();
-  if (fbOk) return;
+    // FIX: comparación segura — cubre booleano false Y string "false"
+    const accesoAlumnos = h.acceso_alumnos !== false && h.acceso_alumnos !== 'false';
+    const activo        = h.activo         !== false && h.activo         !== 'false';
 
-  // 3. Caché horario_asistencia del GAS (fallback viejo)
+    if (!accesoAlumnos || !activo) {
+      mostrarBloqueoPWA('alumnos_off');
+      return;
+    }
+
+    ocultarBloqueoPWA();
+    actualizarChip(h);
+    return;
+
+  } catch(e) {
+    console.error('[INMU] Error cargando horario:', e);
+  }
+
+  // Fallback: caché local (solo si el servidor no respondió)
   try {
     const cached = JSON.parse(localStorage.getItem('horario_asistencia') || '{}');
-    if (_aplicarHorario(cached)) {
+    if (cached.inicio) {
+      const accesoAlumnos = cached.acceso_alumnos !== false && cached.acceso_alumnos !== 'false';
+      const activo        = cached.activo         !== false && cached.activo         !== 'false';
+
+      if (cached.mantenimiento === true) {
+        mostrarBloqueoPWA('mantenimiento');
+        return;
+      }
+      if (!accesoAlumnos || !activo) {
+        mostrarBloqueoPWA('alumnos_off');
+        return;
+      }
+      actualizarChip(cached);
       notif('📴 Sin conexión — usando horario guardado.', 'info', 4000);
       return;
     }
   } catch(_) {}
 
-  // 4. GAS como último recurso
-  try {
-    const h = await fetchJsonp(SCRIPT_URL + '?tipo=horario_asistencia', 10000);
-    try { localStorage.setItem('horario_asistencia', JSON.stringify(h)); } catch(_) {}
-    if (_aplicarHorario(h)) return;
-  } catch(e) {
-    console.error('[INMU] Error cargando horario del GAS:', e);
-  }
-
   chip.className = 'horario-chip inactive';
   chip.textContent = '⚠ No se pudo verificar el horario';
   mostrarBloqueoPWA('offline');
-}
-
-async function _cargarHorarioFirebase() {
-  try {
-    if (typeof firebase === 'undefined') return false;
-    const db = firebase.apps.length ? firebase.firestore() : null;
-    if (!db) return false;
-    const snap = await Promise.race([
-      db.collection('config_inmu').doc('sistema').get(),
-      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000))
-    ]);
-    if (!snap.exists) return false;
-    const cfg = snap.data();
-    const h = {
-      inicio:         cfg.horario_inicio     || '07:00',
-      fin:            cfg.horario_fin        || '15:00',
-      activo:         cfg.modo_alumno_activo !== false,
-      acceso_alumnos: cfg.modo_alumno_activo !== false,
-      mantenimiento:  cfg.mantenimiento === true
-    };
-    try {
-      localStorage.setItem('fb_horario_cache', JSON.stringify(h));
-      localStorage.setItem('fb_horario_cache_ts', Date.now().toString());
-      localStorage.setItem('horario_asistencia', JSON.stringify(h));
-    } catch(_) {}
-    console.log('[INMU] Horario desde Firebase ✓', h);
-    return _aplicarHorario(h);
-  } catch(e) {
-    console.warn('[INMU] Firebase horario falló:', e.message);
-    return false;
-  }
 }
 
 function mostrarBannerSistema(tipo, msg) {
@@ -1189,10 +1164,15 @@ function getHorario() {
 function dentroDelHorario(h) {
   h = h || getHorario();
   const [hi, hm] = (h.inicio||'06:30').split(':').map(Number);
-  const [fi, fm] = (h.fin   ||'08:10').split(':').map(Number);
+  let [fi, fm]   = (h.fin   ||'08:10').split(':').map(Number);
   const now = new Date();
   const m   = now.getHours() * 60 + now.getMinutes();
-  return m >= hi*60+hm && m <= fi*60+fm;
+  const inicioMin = hi*60 + hm;
+  // 00:00 como fin = medianoche = fin del día = 23:59
+  const finMin = (fi === 0 && fm === 0) ? 23*60+59 : fi*60+fm;
+  // Si fin < inicio, el rango cruza medianoche (ej: 22:00-02:00)
+  if (finMin < inicioMin) return m >= inicioMin || m <= finMin;
+  return m >= inicioMin && m <= finMin;
 }
 
 // ════════════════════════════════════════════════════════════
