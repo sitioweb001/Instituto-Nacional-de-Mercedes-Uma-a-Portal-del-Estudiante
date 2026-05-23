@@ -129,47 +129,48 @@ async function _refrescarDesdeFirestore() {
 function _escucharHorario() {
   if (!_fbListo || !_fbDb) return;
 
-  // Primero intentar leer instantáneamente (get) para no esperar el snapshot
-  _fbDb.collection('config_inmu').doc('sistema').get().then(snap => {
-    if (!snap.exists) return;
-    const cfg = snap.data();
-    // El doc 'sistema' tiene horario_inicio, horario_fin, modo_alumno_activo
-    const h = {
-      inicio:         cfg.horario_inicio     || '07:00',
-      fin:            cfg.horario_fin        || '15:00',
-      activo:         cfg.modo_alumno_activo !== false,
-      acceso_alumnos: cfg.modo_alumno_activo !== false,
-      mantenimiento:  cfg.mantenimiento === true
-    };
-    try {
-      localStorage.setItem(FB_HORARIO_KEY, JSON.stringify(h));
-      localStorage.setItem(FB_HORARIO_TS_KEY, Date.now().toString());
-    } catch (_) {}
-    if (typeof actualizarChip === 'function') actualizarChip(h);
-    console.log('[FB-Alumno] Horario cargado instantáneamente desde Firebase ✓', h);
-  }).catch(e => console.warn('[FB-Alumno] Error leyendo horario:', e));
+  // Escuchar config_inmu/horario (escrito por firebase-config.js al guardar horario)
+  _fbDb.collection('config_inmu').doc('horario')
+    .onSnapshot(snap => {
+      if (!snap.exists) return;
+      const h = snap.data();
+      _aplicarHorario(h);
+      console.log('[FB-Alumno] Horario (doc horario) actualizado ✓');
+    }, e => console.warn('[FB-Alumno] Error escuchando horario:', e));
 
-  // También escuchar cambios en tiempo real
+  // También escuchar config_inmu/sistema (fuente principal del INDEX_DOCENTE)
   _fbDb.collection('config_inmu').doc('sistema')
     .onSnapshot(snap => {
       if (!snap.exists) return;
-      const cfg = snap.data();
+      const s = snap.data();
+      // Convertir formato sistema → formato horario
       const h = {
-        inicio:         cfg.horario_inicio     || '07:00',
-        fin:            cfg.horario_fin        || '15:00',
-        activo:         cfg.modo_alumno_activo !== false,
-        acceso_alumnos: cfg.modo_alumno_activo !== false,
-        mantenimiento:  cfg.mantenimiento === true
+        inicio:         s.horario_inicio    || '07:00',
+        fin:            s.horario_fin       || '15:00',
+        activo:         s.modo_alumno_activo !== false,
+        acceso_alumnos: s.modo_alumno_activo !== false,
+        mantenimiento:  s.mantenimiento === true
       };
-      try {
-        localStorage.setItem(FB_HORARIO_KEY, JSON.stringify(h));
-        localStorage.setItem(FB_HORARIO_TS_KEY, Date.now().toString());
-      } catch (_) {}
-      if (typeof actualizarChip === 'function') actualizarChip(h);
-      console.log('[FB-Alumno] Horario actualizado en tiempo real ✓');
-    }, e => {
-      console.warn('[FB-Alumno] Error escuchando horario:', e);
-    });
+      _aplicarHorario(h);
+      // Sincronizar al doc horario para consistencia
+      _fbDb.collection('config_inmu').doc('horario')
+        .set(h, { merge: true }).catch(() => {});
+      console.log('[FB-Alumno] Horario (doc sistema) actualizado ✓', h);
+    }, e => console.warn('[FB-Alumno] Error escuchando sistema:', e));
+}
+
+function _aplicarHorario(h) {
+  try {
+    localStorage.setItem(FB_HORARIO_KEY, JSON.stringify(h));
+    localStorage.setItem(FB_HORARIO_TS_KEY, Date.now().toString());
+    // También en clave estándar que usa getHorario() del index_ALLUMNO
+    localStorage.setItem('horario_asistencia', JSON.stringify(h));
+  } catch (_) {}
+  if (typeof actualizarChip === 'function') actualizarChip(h);
+  // Si hay bloqueo activo y ahora el acceso está habilitado, quitar bloqueo
+  if (h.acceso_alumnos !== false && h.mantenimiento !== true) {
+    if (typeof ocultarBloqueoPWA === 'function') ocultarBloqueoPWA();
+  }
 }
 
 // ── VERIFICACIÓN LOCAL (la magia) ─────────────────────────────────────────────
