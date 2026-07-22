@@ -815,7 +815,22 @@
 // CONFIG
 // ════════════════════════════════════════════════════════════
 const SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbxKnxasl94QOwaLx2QZMDNnfNG8NTtnWg1agE9shf9cyeYeP1PsgtUjbu4X94lXRSIM/exec";
-const PASS_OVERRIDE = "747-8";
+// El valor de abajo es solo el respaldo por defecto. El valor real y editable
+// vive en Firestore (config_inmu/seguridad, mismo documento que usa el Control
+// Maestro de Contraseñas del Sistema de Asistencia) y se carga con
+// cargarClaveOverride() — por eso es "let" y no "const".
+let PASS_OVERRIDE = "747-8";
+async function cargarClaveOverride(intentos) {
+  try {
+    if (typeof _fbDb === 'undefined' || !_fbDb) {
+      if ((intentos || 0) < 15) return setTimeout(() => cargarClaveOverride((intentos || 0) + 1), 500);
+      return;
+    }
+    const snap = await _fbDb.collection('config_inmu').doc('seguridad').get();
+    if (snap.exists && snap.data().pass_override_portal) PASS_OVERRIDE = snap.data().pass_override_portal;
+  } catch (e) { console.warn('[Portal] No se pudo cargar el código administrativo desde Firebase, usando el de respaldo.', e); }
+}
+cargarClaveOverride();
 const TECNICO       = "";
 const DEVICE_KEY    = 'inmu_device_used_today';
 
